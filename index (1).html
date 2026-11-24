@@ -1,0 +1,1752 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cake Fractions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+<style>
+/* Layout: the drawing fills the left, every control sits in one column on the right, so the whole lesson fits one screen. */
+:root {
+  --bg: #FFF8F2;          /* bakery-paper white */
+  --panel: #FFFFFF;
+  --ink: #3A2A33;         /* cocoa ink */
+  --muted: #7A6670;
+  --line: #EBDDE2;
+  --accent: #D9467A;      /* raspberry, from the cake's piping */
+  --accent-soft: #FCE3EC;
+  --focus: #2F62B0;
+  --plate: #DCE6EF;
+  --font: "Andika", "Trebuchet MS", Verdana, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #221A1F; --panel: #2E242A; --ink: #F7ECEF; --muted: #C2AEB6; --line: #4A3B43;
+  --accent: #FF7FA8; --accent-soft: #4A2635; --focus: #8DB3F0; --plate: #3C4652; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #221A1F; --panel: #2E242A; --ink: #F7ECEF; --muted: #C2AEB6; --line: #4A3B43;
+  --accent: #FF7FA8; --accent-soft: #4A2635; --focus: #8DB3F0; --plate: #3C4652; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; }
+.wrap { max-width: 1500px; margin: 0 auto; padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 370px); gap: 14px; align-items: start; }
+.stage { background: var(--panel); border: 2px solid var(--line); border-radius: var(--r); padding: 6px; }
+.stage svg { display: block; margin: 0 auto; height: auto; max-width: 100%; }
+.side { display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 24px); overflow-y: auto; min-width: 0; }
+.side > * { flex-shrink: 0; }
+h1 { font-size: 26px; margin: 0; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+.setting { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.seg { display: inline-flex; border: 2px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; min-height: 38px; padding: 4px 14px; }
+.seg button + button { border-left: 2px solid var(--line); }
+button { font: inherit; font-weight: 700; color: var(--ink); background: var(--panel); border: 2px solid var(--line);
+  border-radius: 10px; padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.seg button[aria-pressed="true"] { border-color: var(--line); }
+button:disabled { opacity: .45; cursor: default; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; font-weight: 700; font-size: 16px; }
+.frac span:first-child { border-bottom: 2.5px solid currentColor; padding: 0 3px 2px; }
+.frac span:last-child { padding-top: 2px; }
+.row { background: var(--panel); border: 2px solid var(--line); border-radius: var(--r); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+.row-head { display: flex; align-items: center; gap: 8px; }
+.row h2 { font-size: 18px; margin: 0; flex: 1; }
+select { font: inherit; font-weight: 700; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 8px; padding: 4px 6px; }
+.picks { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.picks button { min-height: 44px; padding: 2px; border-radius: 8px; }
+.picks button:first-child { font-size: 13px; }
+.picks .frac { font-size: 15px; }
+.line2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.fin { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.fin input { width: 46px; font: inherit; font-size: 18px; font-weight: 700; text-align: center; color: var(--ink); background: var(--bg);
+  border: 2px solid var(--line); border-radius: 8px; padding: 1px; }
+.fin input:first-child { border-bottom: 3px solid var(--ink); }
+.line2 button { min-height: 36px; padding: 3px 12px; font-size: 15px; }
+.msg { color: var(--accent); font-weight: 700; }
+.size { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 120px; }
+input[type=range] { accent-color: var(--accent); flex: 1; min-width: 70px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions button { flex: 1 1 auto; font-size: 15px; }
+.caption { font-size: 16px; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.caption .frac { font-size: 17px; }
+.hint { display: none !important; } /* teacher notes removed from every part */
+[hidden] { display: none !important; }
+.stage svg, .stage canvas { user-select: none; -webkit-user-select: none; }
+#p3 { display: block; margin: 0 auto; width: 100%; max-height: calc(100vh - 40px); object-fit: contain; }
+#draw { display: block; margin: 0 auto; max-width: 100%; touch-action: none; cursor: crosshair; }
+.wholes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; flex-basis: 100%; font-size: 15px; }
+.wholes select { font-size: 15px; }
+#story { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 16px; margin-bottom: 8px; border-radius: 12px; background: var(--accent-soft); font-size: clamp(18px, 2vw, 24px); line-height: 1.4; }
+#story p { margin: 0; flex: 1 1 420px; min-width: 0; }
+#story .seg button { min-height: 40px; padding: 4px 14px; font-size: 16px; }
+.student #wholeCtl, .student #speedBox, .student #pickRow, .student .hint { display: none !important; }
+.student #drawCtl button { min-height: 56px; font-size: 18px; }
+.tabs { display: flex; } .tabs button { flex: 1; font-size: 14px; min-height: 40px; }
+#shapesPanel .picks button { font-size: 14px; }
+@media (max-width: 820px) { .main { grid-template-columns: 1fr; } .side { max-height: none; } }
+</style>
+
+<div class="wrap">
+  <div class="main">
+    <div class="stage"><div id="story" hidden></div><svg id="svg" viewBox="40 0 720 560" role="img" aria-label="Food cut into equal parts"></svg>
+      <svg id="svg2" viewBox="0 0 960 400" role="img" aria-label="Three squares, each cut into equal parts of a different shape" hidden></svg>
+      <canvas id="draw" width="960" height="960" style="display:none" aria-label="A square to cut: drag from dot to dot to draw a cut, tap a part to colour it"></canvas>
+      <canvas id="p3" width="880" height="520" style="display:none" aria-label="Two figures, A and B, on a grid"></canvas></div>
+    <div class="side">
+      <div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><h1>Cake Fractions</h1><button id="b-full" style="min-height:36px;font-size:14px">Full screen</button></div>
+      <div class="seg tabs" role="group" aria-label="What to show">
+        <button id="tab-cut" aria-pressed="true">Part 1</button><button id="tab-shapes" aria-pressed="false">Part 2</button><button id="tab-p3" aria-pressed="false">Part 3</button>
+      </div>
+      <div id="cutPanel" style="display:flex;flex-direction:column;gap:8px">
+      <div class="top">
+        <div class="setting">How many
+          <div class="seg" role="group" aria-label="How many to show">
+            <button id="n1" aria-pressed="false">1</button><button id="n2" aria-pressed="true">2</button><button id="n3" aria-pressed="false">3</button>
+          </div>
+        </div>
+        <label class="setting" for="zoom">Zoom <input id="zoom" type="range" min="35" max="100" value="100"></label>
+      </div>
+      <div id="rows" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div class="actions">
+        <button id="b-stack" disabled>Put the pieces on top of each other</button>
+        <button id="b-move" aria-pressed="false">Move coloured parts</button>
+        <button id="b-fit" disabled>Cut to fit</button>
+        <button id="b-replay">Cut again</button>
+      </div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+      <p class="hint">Keep them the same size to compare the pieces, or change one size and ask: is half of a small cake the same as half of a big cake?</p>
+      </div>
+      <div id="p3Panel" style="display:flex;flex-direction:column;gap:8px" hidden>
+        <div class="row">
+          <h2>Same shape? Same size?</h2>
+          <div class="picks" role="group" aria-label="Example" style="grid-template-columns:repeat(6,minmax(0,1fr))">
+            <button id="ex0" aria-pressed="true" style="font-size:17px">1</button><button id="ex1" aria-pressed="false">2</button><button id="ex2" aria-pressed="false">3</button><button id="ex3" aria-pressed="false">4</button><button id="ex4" aria-pressed="false">5</button><button id="ex5" aria-pressed="false">6</button>
+          </div>
+          <div class="actions"><button id="p3-prev">Back</button><button id="p3-next">Next</button></div>
+        </div>
+        <div class="row">
+          <div class="line2" style="font-size:16px;color:var(--ink)"><b style="min-width:7.5em">Same shape?</b><button id="v-shape-y" aria-pressed="false">Yes</button><button id="v-shape-n" aria-pressed="false">No</button></div>
+          <div class="line2" style="font-size:16px;color:var(--ink)"><b style="min-width:7.5em">Same size?</b><button id="v-size-y" aria-pressed="false">Yes</button><button id="v-size-n" aria-pressed="false">No</button></div>
+        </div>
+        <div class="actions">
+          <button id="p3-check">Move A onto B</button><button id="p3-back">Put it back</button>
+          <button id="p3-grid" aria-pressed="false">Show small squares</button><button id="p3-answer" aria-pressed="false">Show answer</button>
+          <label class="setting" for="p3-speed" style="font-size:15px">Speed <select id="p3-speed"><option value="slow" selected>Slow</option><option value="medium">Medium</option><option value="fast">Fast</option></select></label>
+        </div>
+        <div class="caption" id="caption3" aria-live="polite"></div>
+        <p class="hint">Ask the class to decide first: is A the same shape as B? Is it the same size? Then move A onto B. Same size means A covers B exactly, even if A has to be cut and moved. Same shape means A looks the same as B, just bigger, smaller, turned or flipped.</p>
+      </div>
+      <div id="shapesPanel" style="display:flex;flex-direction:column;gap:8px" hidden>
+        <div class="row" id="pickRow">
+          <h2>Cut each square into</h2>
+          <div class="picks" role="group" aria-label="Number of equal parts" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+            <button id="sh2" aria-pressed="false">2 equal parts</button><button id="sh4" aria-pressed="true">4 equal parts</button><button id="sh8" aria-pressed="false">8 equal parts</button><button id="shD" aria-pressed="false">Draw my own</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="sh-grid" aria-pressed="false">Show small squares</button>
+          <button id="sh-again">Cut again</button>
+          <button id="sh-fit" disabled>Cut to fit</button>
+        </div>
+        <div class="actions" id="drawCtl" hidden>
+          <button id="stu" aria-pressed="false" style="flex-basis:100%">Student mode</button>
+          <div class="wholes" id="wholeCtl">
+            <b>Wholes</b>
+            <div class="seg" role="group" aria-label="How many wholes"><button id="wh1" aria-pressed="true">1</button><button id="wh2" aria-pressed="false">2</button></div>
+            <span id="whRows"></span>
+          </div>
+          <div class="seg tabs" role="group" aria-label="What dragging does" style="flex-basis:100%">
+            <button id="tool-cut" aria-pressed="true">Cut</button><button id="tool-move" aria-pressed="false">Move parts</button>
+          </div>
+          <label class="setting" id="speedBox" for="dr-speed" style="font-size:15px">Speed <select id="dr-speed"><option value="slow" selected>Slow</option><option value="medium">Medium</option><option value="fast">Fast</option></select></label>
+          <button id="pc-turn" disabled>Turn</button><button id="pc-flip" disabled>Flip over</button>
+          <button id="dr-undo">Undo</button><button id="dr-clear">Clear</button><button id="dr-sizes" aria-pressed="false">Show sizes</button>
+          <button id="dr-check" disabled>Fit one part into the other</button><button id="dr-back" disabled>Put it back</button>
+        </div>
+        <div class="caption" id="caption2" aria-live="polite"></div>
+        <p class="hint" id="moveHint" hidden>Move parts: drag any part onto another part to see how they overlap. Use Turn and Flip over on the part you last moved. You can move two parts onto one. "Put it back" returns them all.</p>
+        <p class="hint" id="drawHint" hidden>Drag from any dot to any other dot to cut. Tap two parts to colour them, then "Fit one part into the other" moves the first part you tapped onto the second. If the shapes are different, it is broken into pieces that are turned to fit (this works when cuts go across, down, or corner to corner of the small squares).</p>
+        <p class="hint" id="readyHint">The three squares are the same whole. Each is cut into equal parts of a different shape. Turn on the small squares and count: how many small squares are in each shaded part?</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("svg");
+const cap = document.getElementById("caption");
+const rowsEl = document.getElementById("rows");
+const X0 = 100, W = 600, TOP = 90, FRONT = 100, SLOT = 280, Y0 = 40;
+const CX = 400, CY = 122, R = 116, HOLE = 44; // round things
+const LETTERS = ["A", "B", "C"];
+const COLS = ["#2F62B0", "#1F7A55", "#C2570C"]; // A blue, B green, C orange
+const SHAPES = { cake: "Cake", round: "Round cake", donut: "Donut", orange: "Orange", choc: "Chocolate bar" };
+// The movement is what the lesson is about, so it plays even when the device is set to reduce motion.
+const reduce = false;
+const T = (ms) => reduce ? 1 : ms;
+const sleep = (ms) => new Promise((r) => setTimeout(r, T(ms)));
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const fracHTML = (t, b) => `<span class="frac" aria-label="${t} out of ${b}"><span>${t}</span><span>${b}</span></span>`;
+
+const state = { count: 2, cakes: [{ shape: "cake", n: 2, take: 0, size: 1 }, { shape: "cake", n: 4, take: 0, size: 1 }, { shape: "cake", n: 3, take: 0, size: 1 }] };
+const runs = [0, 0, 0];
+let views = [], stacked = false;
+
+// ---------- artwork (drawn once into <defs>, reused by every piece) ----------
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const SPR = ["#F2545B", "#3FA7D6", "#FAC748", "#59CD90", "#9B5DE5", "#FFFFFF"];
+const sprinkle = (g, x, y, i) => el("rect", { x: x - 5, y: y - 1.6, width: 10, height: 3.2, rx: 1.6, fill: SPR[i % SPR.length], transform: `rotate(${rnd() * 180} ${x} ${y})` }, g);
+
+function artCake(d) {
+  seed = 7; const g = el("g", { id: "art-cake" }, d);
+  el("rect", { x: X0, y: TOP, width: W, height: FRONT, rx: 6, fill: "#F9C9D8" }, g);
+  el("rect", { x: X0, y: TOP + 12, width: W, height: 32, fill: "#F7D58C" }, g);
+  el("rect", { x: X0, y: TOP + 44, width: W, height: 10, fill: "#F59AB8" }, g);
+  el("rect", { x: X0, y: TOP + 54, width: W, height: 32, fill: "#F7D58C" }, g);
+  for (let i = 0; i < 90; i++) el("circle", { cx: X0 + 6 + rnd() * (W - 12), cy: TOP + (rnd() < .5 ? 16 + rnd() * 24 : 58 + rnd() * 24), r: 1.6, fill: "#E2B865" }, g);
+  el("rect", { x: X0, y: 0, width: W, height: TOP + 8, rx: 12, fill: "#F8A9C3" }, g);
+  el("rect", { x: X0 + 14, y: 12, width: W - 28, height: TOP - 22, rx: 8, fill: "#FBBED2" }, g);
+  for (let i = 0; i < 70; i++) sprinkle(g, X0 + 24 + rnd() * (W - 48), 18 + rnd() * (TOP - 34), i);
+  for (let x = X0 + 8; x <= X0 + W - 8; x += 16) {
+    el("circle", { cx: x, cy: 4, r: 9, fill: "#EF7FA8" }, g); el("circle", { cx: x, cy: TOP + 4, r: 9, fill: "#EF7FA8" }, g);
+    el("circle", { cx: x, cy: TOP + FRONT - 4, r: 8, fill: "#EF7FA8" }, g);
+  }
+  for (let y = 12; y <= TOP - 4; y += 16) { el("circle", { cx: X0 + 4, cy: y, r: 8, fill: "#EF7FA8" }, g); el("circle", { cx: X0 + W - 4, cy: y, r: 8, fill: "#EF7FA8" }, g); }
+}
+function artChoc(d) {
+  const g = el("g", { id: "art-choc" }, d);
+  el("rect", { x: X0, y: 30, width: W, height: 160, rx: 10, fill: "#5A3220" }, g);
+  el("rect", { x: X0 + 8, y: 38, width: W - 16, height: 144, rx: 7, fill: "#7A4A2E" }, g);
+  el("rect", { x: X0 + 16, y: 46, width: W - 32, height: 128, rx: 5, fill: "#6B3E26" }, g);
+  el("rect", { x: X0 + 16, y: 46, width: W - 32, height: 14, rx: 5, fill: "#8C5A3A", opacity: .7 }, g);
+}
+function artRound(d) {
+  seed = 11; const g = el("g", { id: "art-round" }, d);
+  el("circle", { cx: CX, cy: CY, r: R, fill: "#F8A9C3" }, g);
+  el("circle", { cx: CX, cy: CY, r: R - 16, fill: "#FBBED2" }, g);
+  for (let i = 0; i < 80; i++) { const a = rnd() * 6.283, r = Math.sqrt(rnd()) * (R - 26); sprinkle(g, CX + r * Math.cos(a), CY + r * Math.sin(a), i); }
+  for (let a = 0; a < 360; a += 9) { const t = a * Math.PI / 180; el("circle", { cx: CX + (R - 4) * Math.cos(t), cy: CY + (R - 4) * Math.sin(t), r: 9, fill: "#EF7FA8" }, g); }
+}
+function artDonut(d) {
+  seed = 5; const g = el("g", { id: "art-donut" }, d);
+  const ring = (ro, ri, fill) => el("path", { d: `M ${CX - ro} ${CY} a ${ro} ${ro} 0 1 0 ${2 * ro} 0 a ${ro} ${ro} 0 1 0 ${-2 * ro} 0 Z M ${CX - ri} ${CY} a ${ri} ${ri} 0 1 1 ${2 * ri} 0 a ${ri} ${ri} 0 1 1 ${-2 * ri} 0 Z`, fill, "fill-rule": "evenodd" }, g);
+  ring(R, HOLE, "#D9A066");
+  ring(R - 14, HOLE + 10, "#F49AC1");
+  for (let i = 0; i < 70; i++) { const a = rnd() * 6.283, r = HOLE + 16 + rnd() * (R - HOLE - 36); sprinkle(g, CX + r * Math.cos(a), CY + r * Math.sin(a), i); }
+}
+function artOrange(d) {
+  seed = 3; const g = el("g", { id: "art-orange" }, d);
+  el("circle", { cx: CX, cy: CY, r: R, fill: "#F28C18" }, g);
+  el("circle", { cx: CX, cy: CY, r: R - 9, fill: "#FFF1D6" }, g);
+  el("circle", { cx: CX, cy: CY, r: R - 16, fill: "#FFA62B" }, g);
+  for (let i = 0; i < 160; i++) { const a = rnd() * 6.283, r = 12 + rnd() * (R - 32); el("ellipse", { cx: CX + r * Math.cos(a), cy: CY + r * Math.sin(a), rx: 2.2, ry: 5, fill: "#FFC560", transform: `rotate(${a * 57.3 + 90} ${CX + r * Math.cos(a)} ${CY + r * Math.sin(a)})` }, g); }
+  el("circle", { cx: CX, cy: CY, r: 9, fill: "#FFF1D6" }, g);
+}
+
+// ---------- shapes: strips (cake, chocolate) or wedges (round cake, donut, orange) ----------
+const isRound = (shape) => shape === "round" || shape === "donut" || shape === "orange";
+const pt = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
+const ang = (n, i) => -Math.PI / 2 + i * 2 * Math.PI / n;
+function wedge(n, i, ro, ri = 0) {
+  const a0 = ang(n, i), a1 = ang(n, i + 1), big = a1 - a0 > Math.PI ? 1 : 0;
+  const [x0, y0] = pt(ro, a0), [x1, y1] = pt(ro, a1);
+  if (!ri) return `M ${CX} ${CY} L ${x0} ${y0} A ${ro} ${ro} 0 ${big} 1 ${x1} ${y1} Z`;
+  const [x2, y2] = pt(ri, a1), [x3, y3] = pt(ri, a0);
+  return `M ${x0} ${y0} A ${ro} ${ro} 0 ${big} 1 ${x1} ${y1} L ${x2} ${y2} A ${ri} ${ri} 0 ${big} 0 ${x3} ${y3} Z`;
+}
+function geom(shape, n) {
+  if (!isRound(shape)) {
+    const y0 = shape === "choc" ? 30 : 0, y1 = shape === "choc" ? 190 : TOP + FRONT;
+    return {
+      anchor: [X0, 0], knife: true, name: [X0 - 40, TOP + FRONT + 48],
+      clip: (i) => ["rect", { x: X0 + i * W / n - (i === 0 ? 20 : 0), y: -20, width: W / n + (i === 0 ? 20 : 0) + (i === n - 1 ? 20 : 0), height: TOP + FRONT + 30 }],
+      tint: (i) => ["rect", { x: X0 + i * W / n + 3, y: y0 - 3, width: Math.max(4, W / n - 6), height: y1 - y0 + 4, rx: 6 }],
+      cuts: () => Array.from({ length: n - 1 }, (_, j) => { const x = X0 + (j + 1) * W / n; return { x1: x, y1: y0 - 6, x2: x, y2: y1 + 4, x }; }),
+      plate: shape === "cake" ? ["rect", { x: X0 - 50, y: TOP + FRONT - 6, width: W + 100, height: 22, rx: 11 }] : null,
+    };
+  }
+  const ri = shape === "donut" ? HOLE : 0;
+  return {
+    anchor: [CX, CY], knife: false, name: [CX - R - 150, CY + 8],
+    clip: (i) => n === 1 ? ["rect", { x: CX - R - 30, y: CY - R - 30, width: 2 * R + 60, height: 2 * R + 60 }] : ["path", { d: wedge(n, i, R + 30) }],
+    tint: (i) => n === 1 ? ["circle", { cx: CX, cy: CY, r: R - 3 }] : ["path", { d: wedge(n, i, R - 3, ri ? ri + 2 : 0) }],
+    cuts: () => n === 1 ? [] : Array.from({ length: n }, (_, j) => { const a = ang(n, j); const [x1, y1] = pt(ri ? ri - 2 : 0, a), [x2, y2] = pt(R + 6, a); return { x1, y1, x2, y2 }; }),
+    plate: shape === "round" ? ["circle", { cx: CX, cy: CY, r: R + 18 }] : null,
+  };
+}
+
+const place = (s) => s.g.setAttribute("transform", `translate(${s.dx} ${s.dy})`);
+// frame-by-frame animation: works in every browser, including Safari on iPad
+const ease = (p) => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const tween = (ms, fn) => new Promise((done) => {
+  const d = T(ms), t0 = performance.now();
+  const step = (now) => { const p = Math.min(1, (now - t0) / d); fn(ease(p)); if (p < 1) requestAnimationFrame(step); else done(); };
+  requestAnimationFrame(step);
+});
+
+// ---------- build one item (not yet cut) ----------
+function build(k) {
+  const { shape, n, size, take } = state.cakes[k];
+  const G = geom(shape, n), y = Y0 + k * SLOT;
+  const outer = el("g", { transform: `translate(${G.anchor[0] * (1 - size)} ${y}) scale(${size})` }, svg);
+  if (G.plate) el(G.plate[0], { ...G.plate[1], fill: "var(--plate)" }, outer);
+  const nm = el("text", { x: G.name[0], y: G.name[1], "font-family": "Andika, Verdana, sans-serif", "font-size": 30 / Math.max(size, .6), "font-weight": 700, fill: COLS[k] }, outer);
+  nm.textContent = LETTERS[k];
+  const defs = svg.querySelector("defs"), slices = [];
+  for (let i = 0; i < n; i++) {
+    const cp = el("clipPath", { id: `c${k}_${i}` }, defs); const [t, a] = G.clip(i); el(t, a, cp);
+    const g = el("g", {}, outer);
+    g.style.transition = `opacity ${T(500)}ms`;
+    el("use", { href: `#art-${shape}`, "clip-path": `url(#c${k}_${i})` }, g);
+    slices.push({ g, dx: 0, dy: 0, tint: null });
+  }
+  const cuts = G.cuts().map((c) => {
+    const len = Math.hypot(c.x2 - c.x1, c.y2 - c.y1) + 4;
+    const ln = el("line", { x1: c.x1, y1: c.y1, x2: c.x2, y2: c.y2, stroke: shape === "choc" ? "#2A140A" : "#7A3B52", "stroke-width": 3 / Math.max(size, .6), "stroke-linecap": "round", "stroke-dasharray": len, "stroke-dashoffset": len }, outer);
+    ln.style.transition = `opacity ${T(400)}ms`;
+    return { ln, x: c.x, len };
+  });
+  const kn = el("g", { opacity: 0 }, outer);
+  el("rect", { x: -9, y: -150, width: 18, height: 62, rx: 7, fill: "#8A5A3C" }, kn);
+  el("path", { d: "M -12 -88 L 12 -88 L 12 40 Q 0 62 -12 40 Z", fill: "#D7DEE6", stroke: "#9AA7B4", "stroke-width": 2 }, kn);
+  return { k, shape, n, take, size, y, G, outer, slices, cuts, kn, ready: false };
+}
+
+function shade(v, m, alpha) {
+  v.slices.forEach((s, i) => {
+    if (i >= m) return;
+    if (!s.tint) {
+      const [t, a] = v.G.tint(i);
+      s.tint = el(t, { ...a, fill: COLS[v.k], stroke: COLS[v.k], "stroke-width": 6 / Math.max(v.size, .6), "stroke-linejoin": "round", opacity: 0 }, s.g);
+      s.tint.style.transition = `opacity ${T(500)}ms`;
+      requestAnimationFrame(() => s.tint.setAttribute("opacity", 1));
+    }
+    s.tint.setAttribute("fill-opacity", alpha);
+  });
+}
+
+// ---------- cutting ----------
+async function cut(k) {
+  const my = ++runs[k], v = views[k];
+  if (!v) return;
+  if (v.n > 1) {
+    const per = Math.max(v.n > 24 ? 60 : 170, 640 - v.n * 40);
+    if (v.G.knife) v.kn.setAttribute("opacity", 1);
+    for (const c of v.cuts) {
+      if (my !== runs[k]) return;
+      if (v.G.knife) {
+        await tween(per * .55, (p) => { v.kn.setAttribute("transform", `translate(${c.x} ${-60 + 180 * p})`); c.ln.setAttribute("stroke-dashoffset", c.len * (1 - p)); });
+        await tween(per * .4, (p) => v.kn.setAttribute("transform", `translate(${c.x} ${120 - 180 * p})`));
+      } else await tween(per * .6, (p) => c.ln.setAttribute("stroke-dashoffset", c.len * (1 - p)));
+    }
+    v.kn.setAttribute("opacity", 0);
+  }
+  if (my !== runs[k]) return;
+  if (v.take > 0) shade(v, v.take, .5);
+  v.ready = true; refresh();
+}
+function instantCut(v) {
+  v.cuts.forEach((c) => c.ln.setAttribute("stroke-dashoffset", 0));
+  if (v.take > 0) shade(v, v.take, .5);
+  v.ready = true;
+}
+
+function drawAll() {
+  stacked = false; lastStack = null; lastMoved = null; fitSource = null;
+  svg.innerHTML = "";
+  const d = el("defs", {}, svg); artCake(d); artChoc(d); artRound(d); artDonut(d); artOrange(d);
+  svg.setAttribute("viewBox", `40 0 720 ${Y0 + (state.count - 1) * SLOT + 260}`);
+  views = [];
+  for (let k = 0; k < state.count; k++) views.push(build(k));
+  applyZoom();
+}
+function redrawAndCutAll() { runs.forEach((_, i) => runs[i]++); drawAll(); refresh(); views.forEach((v) => cut(v.k)); }
+function redrawOne(k) {
+  runs.forEach((_, i) => runs[i]++);
+  drawAll();
+  views.forEach((v) => { if (v.k !== k) instantCut(v); });
+  refresh(); cut(k);
+}
+function applyZoom() {
+  const z = +document.getElementById("zoom").value / 100;
+  svg.style.width = `${z * 100}%`;
+  svg.style.maxHeight = `calc((100vh - 40px) * ${z})`;
+}
+
+function refresh() {
+  const parts = views.map((v) => `<span style="color:${COLS[v.k]};font-weight:700">${LETTERS[v.k]}:</span> ` + (v.n === 1 ? "1 whole"
+    : v.take > 0 ? `${fracHTML(v.take, v.n)} shaded` : `${v.n} equal parts`));
+  const sizes = new Set(views.map((v) => v.size));
+  cap.innerHTML = parts.join(" &nbsp; ") + (sizes.size > 1 ? " &nbsp;<b>Not the same size.</b>" : "");
+  const cutOnes = views.filter((v) => v.n > 1);
+  document.getElementById("b-stack").disabled = stacked || cutOnes.length < 2 || !cutOnes.every((v) => v.ready);
+  document.getElementById("b-fit").disabled = fitting || !(lastStack || (lastMoved && views.some((w) => w !== lastMoved && w.take > 0)));
+}
+
+// ---------- put each item's shaded pieces (or one piece) on top of A's ----------
+async function stack() {
+  const vs = views.filter((v) => v.n > 1 && v.ready);
+  if (vs.length < 2) return;
+  stacked = true; refresh();
+  const base = vs[0];
+  const m = (v) => Math.max(1, v.take);
+  const area = (v) => v.size * v.size * m(v) / v.n;
+  // 1. colour the pieces being compared, and fade away everything else so only those pieces are left
+  vs.forEach((v) => shade(v, m(v), v === base ? .18 : .55));
+  views.forEach((v) => {
+    const keep = new Set(vs.includes(v) ? v.slices.slice(0, m(v)).map((s) => s.g) : []);
+    [...v.outer.children].forEach((c) => { if (!keep.has(c) && c.getAttribute("opacity") !== "0") { c.style.transition = "opacity 1.2s"; c.style.opacity = .06; } });
+  });
+  cap.innerHTML = "Taking out only the pieces we are comparing…";
+  await sleep(1600);
+  // 2. A's piece moves to the empty middle of the board
+  const vb = svg.viewBox.baseVal, cx = vb.x + vb.width / 2, cy = vb.y + vb.height / 2;
+  const ax = base.G.anchor[0], ay = base.y + base.size * base.G.anchor[1];
+  let tx, ty;
+  if (isRound(base.shape)) { tx = cx; ty = cy; }
+  else { const pw = base.size * m(base) * W / base.n, ph = base.size * (TOP + FRONT); tx = cx - pw / 2; ty = cy - ph / 2; }
+  const gx = tx - ax, gy = ty - ay;
+  svg.appendChild(base.outer);
+  const bs = base.slices.slice(0, m(base));
+  cap.innerHTML = `Moving <span style="color:${COLS[base.k]};font-weight:700">${LETTERS[base.k]}</span>'s piece to an empty space…`;
+  await tween(3000, (p) => bs.forEach((s) => { s.dx = gx / base.size * p; s.dy = gy / base.size * p; place(s); }));
+  const ghostTf = `${base.outer.getAttribute("transform")} translate(${gx / base.size} ${gy / base.size})`;
+  // 3. the other pieces come out of their cakes and land on top of A's piece, biggest first
+  [...vs.slice(1)].sort((a, b) => area(b) - area(a)).forEach((v) => svg.appendChild(v.outer));
+  const ghost = el("g", { transform: ghostTf, "pointer-events": "none" }, svg);
+  bs.forEach((s, i) => { const [t, a] = base.G.tint(i); el(t, { ...a, fill: "none", stroke: COLS[base.k], "stroke-width": 6 / Math.max(base.size, .6), "stroke-dasharray": "14 8", "stroke-linejoin": "round" }, ghost); });
+  for (const v of vs.slice(1)) {
+    const vy = v.G.anchor[1];
+    const mx = (ax + gx - v.G.anchor[0]) / v.size, my = (ay + gy - v.y) / v.size - vy;
+    cap.innerHTML = `Moving <span style="color:${COLS[v.k]};font-weight:700">${LETTERS[v.k]}</span>'s piece on top…`;
+    const ms = v.slices.slice(0, m(v));
+    await tween(3000, (p) => ms.forEach((s) => { s.dx = mx * p; s.dy = my * p; place(s); }));
+    svg.appendChild(ghost);
+  }
+  const key = vs.map((v) => `<span style="color:${COLS[v.k]};font-weight:700">${LETTERS[v.k]}</span> ${fracHTML(m(v), v.n)}`).join(" &nbsp; ");
+  cap.innerHTML = `${key} &nbsp; On top of each other. What do you notice?`;
+  lastStack = { base, movers: vs.slice(1), m, ghost }; fitSource = "stack"; document.getElementById("b-fit").disabled = false;
+}
+
+// ---------- Part 1: cut a coloured part to fit another ----------
+// The part is broken into small bits that pour into the other part.
+// Same size: it fills exactly. Bigger: bits are left over. Smaller: a gap stays.
+let lastStack = null, fitting = false, lastMoved = null, fitSource = null;
+const hitCv = document.createElement("canvas"), hitCtx = hitCv.getContext("2d");
+function pieceTest(v, ids) {
+  const paths = ids.map((i) => {
+    const [t, a] = v.G.tint(i), p = new Path2D();
+    if (t === "rect") p.rect(+a.x, +a.y, +a.width, +a.height);
+    else if (t === "circle") p.arc(+a.cx, +a.cy, +a.r, 0, Math.PI * 2);
+    else p.addPath(new Path2D(a.d));
+    return { p, s: v.slices[i] };
+  });
+  const ox = v.G.anchor[0] * (1 - v.size);
+  return (X, Y) => paths.some(({ p, s }) => { hitCtx.setTransform(v.size, 0, 0, v.size, ox + v.size * s.dx, v.y + v.size * s.dy); return hitCtx.isPointInPath(p, X, Y); });
+}
+function cells(test, step) {
+  const vb = svg.viewBox.baseVal, out = [];
+  for (let Y = vb.y + step / 2; Y < vb.y + vb.height; Y += step) for (let X = vb.x + step / 2; X < vb.x + vb.width; X += step) if (test(X, Y)) out.push([X, Y]);
+  return out;
+}
+const range = (n) => [...Array(n).keys()];
+// the outline of some pieces of a cake, wherever they are now (they move together)
+function outlineOf(v, ids) {
+  const s0 = v.slices[ids[0]];
+  const g = el("g", { transform: `${v.outer.getAttribute("transform")} translate(${s0.dx} ${s0.dy})`, "pointer-events": "none" }, svg);
+  ids.forEach((i) => { const [t, a] = v.G.tint(i); el(t, { ...a, fill: "none", stroke: COLS[v.k], "stroke-width": 6 / Math.max(v.size, .6), "stroke-dasharray": "14 8", "stroke-linejoin": "round" }, g); });
+  return g;
+}
+async function pour(v, ids, base, baseIds, ghost) {
+  const T = 12, inSrc = pieceTest(v, ids), inBase = pieceTest(base, baseIds);
+  const fine = 4, a1 = cells(inSrc, fine).length, a2 = cells(inBase, fine).length, equal = a2 > 0 && Math.abs(a1 - a2) / a2 < .03;
+  let src = cells(inSrc, T), dst = cells(inBase, T);
+  if (equal) { while (src.length > dst.length) src.splice(Math.floor(src.length / 2), 1); while (dst.length > src.length) dst.splice(Math.floor(dst.length / 2), 1); }
+  const box = (P) => { const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]); return [Math.min(...xs), Math.min(...ys), (Math.max(...xs) - Math.min(...xs)) || 1, (Math.max(...ys) - Math.min(...ys)) || 1]; };
+  const order = (P) => { const [x0, y0, w, h] = box(P); return [...P].sort((p, q) => Math.round((p[0] - x0) / w * 30) - Math.round((q[0] - x0) / w * 30) || (p[1] - y0) / h - (q[1] - y0) / h); };
+  src = order(src); dst = order(dst);
+  const g = el("g", { opacity: .62 }, svg), rects = src.map(([x, y]) => el("rect", { x: x - T / 2 - .5, y: y - T / 2 - .5, width: T + 1, height: T + 1, fill: COLS[v.k] }, g));
+  ids.forEach((i) => (v.slices[i].g.style.opacity = 0));
+  svg.appendChild(ghost);
+  cap.innerHTML = `<span style="color:${COLS[v.k]};font-weight:700">${LETTERS[v.k]}</span>: cutting the part up and fitting it into <span style="color:${COLS[base.k]};font-weight:700">${LETTERS[base.k]}</span>'s part…`;
+  const n = src.length, HOLD = 1500, SPREAD = 7000, FLY = 6000, drawn = svg.innerHTML.length;
+  await tween(HOLD + SPREAD + FLY, (pAll) => {
+    const t = pAll * (HOLD + SPREAD + FLY);
+    rects.forEach((r, i) => {
+      const to = dst[i]; if (!to) return;
+      const e = ease(clamp01((t - HOLD - (i / Math.max(1, n - 1)) * SPREAD) / FLY)), lift = Math.sin(Math.PI * e) * -40;
+      r.setAttribute("x", src[i][0] + (to[0] - src[i][0]) * e - T / 2 - .5);
+      r.setAttribute("y", src[i][1] + (to[1] - src[i][1]) * e + lift - T / 2 - .5);
+    });
+  });
+  if (!g.isConnected) return false;   // the board was redrawn meanwhile
+  if (equal) {
+    const clean = el("g", { transform: ghost.getAttribute("transform"), opacity: 0 }, svg);
+    baseIds.forEach((i) => { const [t, a] = base.G.tint(i); el(t, { ...a, fill: COLS[v.k], "fill-opacity": .62 }, clean); });
+    await tween(900, (p) => { clean.setAttribute("opacity", p); g.setAttribute("opacity", .62 * (1 - p)); });
+    g.remove();
+  }
+  svg.appendChild(ghost);
+  return true;
+}
+async function cutToFit() {
+  if (fitting) return;
+  fitting = true; document.getElementById("b-fit").disabled = true;
+  if (fitSource === "drag" && lastMoved) {
+    // the part you just moved pours into the coloured part it overlaps most (or the nearest one)
+    const v = lastMoved, ids = range(v.take), mine = cells(pieceTest(v, ids), 12);
+    const others = views.filter((w) => w !== v && w.take > 0);
+    let best = null;
+    others.forEach((w) => {
+      const t = pieceTest(w, range(w.take)), over = mine.filter(([x, y]) => t(x, y)).length;
+      const c = cells(t, 24), cx = c.reduce((a, p) => a + p[0], 0) / Math.max(1, c.length), cy = c.reduce((a, p) => a + p[1], 0) / Math.max(1, c.length);
+      const mx = mine.reduce((a, p) => a + p[0], 0) / Math.max(1, mine.length), my = mine.reduce((a, p) => a + p[1], 0) / Math.max(1, mine.length);
+      const score = over * 1e6 - Math.hypot(cx - mx, cy - my);
+      if (!best || score > best.score) best = { w, score };
+    });
+    if (best) {
+      const ghost = outlineOf(best.w, range(best.w.take));
+      const ok = await pour(v, ids, best.w, range(best.w.take), ghost);
+      if (ok) cap.innerHTML = `Does <span style="color:${COLS[v.k]};font-weight:700">${LETTERS[v.k]}</span>'s part fit exactly into <span style="color:${COLS[best.w.k]};font-weight:700">${LETTERS[best.w.k]}</span>'s part? Is anything left over, or is there a gap?`;
+    } else cap.innerHTML = "Colour a part in another cake first (write a fraction and press Show).";
+  } else if (lastStack) {
+    const { base, movers, m, ghost } = lastStack;
+    for (const v of movers) if (!(await pour(v, range(m(v)), base, range(m(base)), ghost))) { fitting = false; return; }
+    cap.innerHTML = "Does it fit exactly into A's piece? Is anything left over, or is there a gap?";
+  }
+  fitting = false;
+}
+
+// ---------- Part 1: drag the coloured parts yourself ----------
+let moveMode = false, dragP = null;
+const svgPt = (e) => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); };
+svg.addEventListener("pointerdown", (e) => {
+  if (!moveMode || fitting) return;
+  const pt = svgPt(e), order = [...views].sort((a, b) => [...svg.children].indexOf(b.outer) - [...svg.children].indexOf(a.outer));
+  const v = order.find((w) => w.take > 0 && pieceTest(w, range(w.take))(pt.x, pt.y));
+  if (!v) { cap.innerHTML = "Drag a coloured part. To colour a part, write a fraction and press Show."; return; }
+  svg.setPointerCapture(e.pointerId); svg.appendChild(v.outer);
+  dragP = { v, x0: pt.x, y0: pt.y, start: range(v.take).map((i) => [v.slices[i].dx, v.slices[i].dy]) };
+  svg.style.cursor = "grabbing";
+});
+svg.addEventListener("pointermove", (e) => {
+  if (!dragP) return;
+  const pt = svgPt(e), { v, x0, y0, start } = dragP;
+  range(v.take).forEach((i, k) => { const s = v.slices[i]; s.dx = start[k][0] + (pt.x - x0) / v.size; s.dy = start[k][1] + (pt.y - y0) / v.size; place(s); });
+});
+const endDrag = () => {
+  if (!dragP) return;
+  lastMoved = dragP.v; fitSource = "drag"; dragP = null; svg.style.cursor = moveMode ? "grab" : "";
+  document.getElementById("b-fit").disabled = fitting || !views.some((w) => w !== lastMoved && w.take > 0);
+  cap.innerHTML = "Do the parts cover each other exactly? Press Cut to fit to cut the part you moved to fit the other part.";
+};
+svg.addEventListener("pointerup", endDrag);
+svg.addEventListener("pointercancel", endDrag);
+function setMoveMode(on) {
+  moveMode = on; document.getElementById("b-move").setAttribute("aria-pressed", String(on));
+  svg.style.touchAction = on ? "none" : ""; svg.style.cursor = on ? "grab" : "";
+  if (on) cap.innerHTML = views.some((w) => w.take > 0) ? "Drag a coloured part onto another coloured part." : "First colour some parts: write a fraction for each cake and press Show.";
+}
+
+// ---------- the control card for each item ----------
+function buildRows() {
+  rowsEl.innerHTML = "";
+  for (let k = 0; k < state.count; k++) {
+    const c = state.cakes[k];
+    const row = document.createElement("div"); row.className = "row";
+    row.innerHTML = `<div class="row-head"><h2 style="color:${COLS[k]}">${LETTERS[k]}</h2>
+        <select id="shape${k}" aria-label="${LETTERS[k]}: what to cut">${Object.entries(SHAPES).map(([v, t]) => `<option value="${v}"${v === c.shape ? " selected" : ""}>${t}</option>`).join("")}</select></div>
+      <div class="picks" role="group" aria-label="${LETTERS[k]}: cut into equal parts"></div>
+      <div class="line2"><span>Write:</span>
+        <span class="fin"><input id="t${k}" type="number" min="1" max="100" inputmode="numeric" aria-label="${LETTERS[k]} top number" value="">
+        <input id="b${k}" type="number" min="2" max="100" inputmode="numeric" aria-label="${LETTERS[k]} bottom number" value=""></span>
+        <button id="go${k}">Show</button>
+        <label class="size" for="size${k}">Size of the whole <input id="size${k}" type="range" min="50" max="100" step="5" value="${c.size * 100}"></label></div>
+      <span class="msg" id="m${k}"></span>`;
+    const picks = row.querySelector(".picks");
+    for (let n = 1; n <= 12; n++) {
+      const b = document.createElement("button");
+      b.id = `p${k}_${n}`;
+      b.setAttribute("aria-pressed", String(c.n === n && !c.take));
+      b.innerHTML = n === 1 ? "Whole" : fracHTML(1, n);
+      b.onclick = () => {
+        c.n = n; c.take = 0; row.querySelector(`#t${k}`).value = ""; row.querySelector(`#b${k}`).value = "";
+        picks.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        redrawOne(k);
+      };
+      picks.appendChild(b);
+    }
+    row.querySelector(`#shape${k}`).onchange = (e) => { c.shape = e.target.value; redrawOne(k); };
+    row.querySelector(`#size${k}`).oninput = (e) => { c.size = +e.target.value / 100; redrawOne(k); };
+    const go = () => {
+      const t = parseInt(row.querySelector(`#t${k}`).value, 10), b = parseInt(row.querySelector(`#b${k}`).value, 10);
+      const msg = row.querySelector(`#m${k}`);
+      if (!(b >= 2 && b <= 100)) { msg.textContent = "Bottom number: 2 to 100."; return; }
+      if (!(t >= 1 && t <= b)) { msg.textContent = `Top number: 1 to ${b}.`; return; }
+      msg.textContent = ""; c.n = b; c.take = t;
+      picks.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false"));
+      redrawOne(k);
+    };
+    row.querySelector(`#go${k}`).onclick = go;
+    row.querySelectorAll(".fin input").forEach((i) => (i.onkeydown = (e) => { if (e.key === "Enter") go(); }));
+    rowsEl.appendChild(row);
+  }
+}
+
+// ---------- same whole, different shapes ----------
+const svg2 = document.getElementById("svg2");
+const SQ = 250, SQX = [55, 355, 655], SQY = 60;
+const strips = (n, vertical) => Array.from({ length: n }, (_, i) => vertical
+  ? [[i / n, 0], [(i + 1) / n, 0], [(i + 1) / n, 1], [i / n, 1]] : [[0, i / n], [1, i / n], [1, (i + 1) / n], [0, (i + 1) / n]]);
+const grid = (cols, rows) => { const out = []; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) out.push([[c / cols, r / rows], [(c + 1) / cols, r / rows], [(c + 1) / cols, (r + 1) / rows], [c / cols, (r + 1) / rows]]); return out; };
+const fan = (pts) => pts.map((p, i) => [[.5, .5], p, pts[(i + 1) % pts.length]]);
+const WAYS = {
+  2: [["Two strips", strips(2, true)], ["Two strips the other way", strips(2, false)], ["Two triangles", [[[0, 0], [1, 0], [0, 1]], [[1, 0], [1, 1], [0, 1]]]]],
+  4: [["Four strips", strips(4, true)], ["Four squares", grid(2, 2)], ["Four triangles", fan([[0, 0], [1, 0], [1, 1], [0, 1]])]],
+  8: [["Eight strips", strips(8, true)], ["Eight rectangles", grid(4, 2)], ["Eight triangles", fan([[0, 0], [.5, 0], [1, 0], [1, .5], [1, 1], [.5, 1], [0, 1], [0, .5]])]],
+};
+const sh = { n: 4, grid: false, mode: "ready" }; let shRun = 0;
+async function drawShapes() {
+  const my = ++shRun;
+  svg2.innerHTML = "";
+  const cap2 = document.getElementById("caption2");
+  cap2.innerHTML = `Each square is cut into ${sh.n} equal parts. One part of each is shaded: ${fracHTML(1, sh.n)}`;
+  const groups = WAYS[sh.n].map(([label, parts], w) => {
+    const x = SQX[w], g = el("g", { transform: `translate(${x} ${SQY})` }, svg2);
+    el("rect", { x: 0, y: 0, width: SQ, height: SQ, fill: "#FBE3B8", stroke: "#3A2A33", "stroke-width": 4, rx: 2 }, g);
+    const t = el("text", { x: SQ / 2, y: SQ + 44, "text-anchor": "middle", "font-family": "Andika, Verdana, sans-serif", "font-size": 24, "font-weight": 700, fill: COLS[w] }, g);
+    t.textContent = label;
+    const shade = el("polygon", { points: parts[0].map(([a, b]) => `${a * SQ},${b * SQ}`).join(" "), fill: COLS[w], "fill-opacity": .55, opacity: 0 }, g);
+    const lines = parts.map((pp) => el("polygon", { points: pp.map(([a, b]) => `${a * SQ},${b * SQ}`).join(" "), fill: "none", stroke: "#7A3B52", "stroke-width": 3.5, "stroke-linejoin": "round", pathLength: 1, "stroke-dasharray": 1, "stroke-dashoffset": 1 }, g));
+    const gridG = el("g", { opacity: sh.grid ? 1 : 0, "pointer-events": "none" }, g);
+    for (let i = 1; i < 8; i++) {
+      el("line", { x1: i * SQ / 8, y1: 0, x2: i * SQ / 8, y2: SQ, stroke: "#3A2A33", "stroke-width": 1.2, "stroke-dasharray": "4 4", opacity: .55 }, gridG);
+      el("line", { x1: 0, y1: i * SQ / 8, x2: SQ, y2: i * SQ / 8, stroke: "#3A2A33", "stroke-width": 1.2, "stroke-dasharray": "4 4", opacity: .55 }, gridG);
+    }
+    return { shade, lines, gridG, g, w, poly: parts[0], dx: 0, dy: 0 };
+  });
+  shItems = groups; shMoved = null; shFitting = false; document.getElementById("sh-fit").disabled = true;
+  // draw the cuts square by square, then shade one part of each
+  for (const g of groups) {
+    await tween(Math.max(500, 900 - sh.n * 40), (p) => g.lines.forEach((l) => l.setAttribute("stroke-dashoffset", 1 - p)));
+    if (my !== shRun) return;
+  }
+  await tween(500, (p) => groups.forEach((g) => g.shade.setAttribute("opacity", p)));
+  if (my !== shRun) return;
+  cap2.innerHTML = `Each square is cut into ${sh.n} equal parts. One part of each is shaded: ${fracHTML(1, sh.n)} &nbsp; Are the shaded parts the same size? How do you know?`;
+}
+function setGrid(on) {
+  sh.grid = on; document.getElementById("sh-grid").setAttribute("aria-pressed", String(on));
+  svg2.querySelectorAll("g > g").forEach((g) => g.setAttribute("opacity", on ? 1 : 0));
+  renderDraw();
+}
+[2, 4, 8].forEach((n) => (document.getElementById(`sh${n}`).onclick = () => { sh.n = n; sh.mode = "ready"; showShapes(); }));
+document.getElementById("shD").onclick = () => { sh.mode = "draw"; showShapes(); };
+function showShapes() {
+  const draw = sh.mode === "draw";
+  [2, 4, 8].forEach((m) => document.getElementById(`sh${m}`).setAttribute("aria-pressed", String(!draw && m === sh.n)));
+  document.getElementById("shD").setAttribute("aria-pressed", String(draw));
+  svg2.style.display = draw ? "none" : ""; cv.style.display = draw ? "" : "none";
+  document.getElementById("drawCtl").hidden = !draw; document.getElementById("sh-again").hidden = draw; document.getElementById("sh-fit").hidden = draw;
+  document.getElementById("drawHint").hidden = !draw || dr.tool === "move"; document.getElementById("moveHint").hidden = !draw || dr.tool !== "move"; document.getElementById("readyHint").hidden = draw;
+  document.getElementById("story").hidden = !(draw && stu.on);
+  if (draw) { computeRegions(); renderDraw(); requestAnimationFrame(sizeCanvas); } else drawShapes();
+}
+
+// ---------- the three squares: drag the shaded parts, and cut one to fit another ----------
+let shItems = [], shDrag = null, shMoved = null, shFitting = false;
+const shPt = (e) => { const p = svg2.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg2.getScreenCTM().inverse()); };
+const shGlobal = (it) => it.poly.map(([a, b]) => [SQX[it.w] + a * SQ + it.dx, SQY + b * SQ + it.dy]);
+function inPoly(P, x, y) {
+  let inside = false;
+  for (let i = 0, j = P.length - 1; i < P.length; j = i++) {
+    const [xi, yi] = P[i], [xj, yj] = P[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function shCells(P, step) {
+  const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]), out = [];
+  for (let y = Math.floor(Math.min(...ys)) + step / 2; y < Math.max(...ys); y += step) for (let x = Math.floor(Math.min(...xs)) + step / 2; x < Math.max(...xs); x += step) if (inPoly(P, x, y)) out.push([x, y]);
+  return out;
+}
+const shPoints = (P) => P.map(([x, y]) => `${x},${y}`).join(" ");
+svg2.style.touchAction = "none";
+svg2.addEventListener("pointerdown", (e) => {
+  if (sh.mode !== "ready" || shFitting) return;
+  const pt = shPt(e), order = [...shItems].sort((a, b) => [...svg2.children].indexOf(b.g) - [...svg2.children].indexOf(a.g));
+  const it = order.find((q) => inPoly(shGlobal(q), pt.x, pt.y));
+  if (!it) return;
+  if (!it.home) {   // a dashed outline shows where the part came from
+    it.home = el("polygon", { points: shPoints(it.poly.map(([a, b]) => [a * SQ, b * SQ])), fill: "#FFFDF8", stroke: COLS[it.w], "stroke-width": 3, "stroke-dasharray": "10 7" }, it.g);
+    it.g.insertBefore(it.home, it.shade);
+  }
+  svg2.appendChild(it.g); svg2.setPointerCapture(e.pointerId);
+  shDrag = { it, x0: pt.x, y0: pt.y, dx0: it.dx, dy0: it.dy };
+});
+svg2.addEventListener("pointermove", (e) => {
+  if (!shDrag) return;
+  const pt = shPt(e), { it } = shDrag;
+  it.dx = shDrag.dx0 + pt.x - shDrag.x0; it.dy = shDrag.dy0 + pt.y - shDrag.y0;
+  it.shade.setAttribute("transform", `translate(${it.dx} ${it.dy})`);
+});
+const shEnd = () => {
+  if (!shDrag) return;
+  shMoved = shDrag.it; shDrag = null;
+  document.getElementById("sh-fit").disabled = false;
+  document.getElementById("caption2").innerHTML = "Do the shaded parts cover each other exactly? Press Cut to fit to cut the part you moved to fit another part.";
+};
+svg2.addEventListener("pointerup", shEnd);
+svg2.addEventListener("pointercancel", shEnd);
+async function shCutToFit() {
+  if (!shMoved || shFitting) return;
+  const src = shMoved, others = shItems.filter((q) => q !== src), S = shGlobal(src);
+  const mine = shCells(S, 8), mx = mine.reduce((a, p) => a + p[0], 0) / mine.length, my = mine.reduce((a, p) => a + p[1], 0) / mine.length;
+  // the part it was dropped on (most overlap), or else the nearest one
+  let best = null;
+  others.forEach((q) => {
+    const Q = shGlobal(q), over = mine.filter(([x, y]) => inPoly(Q, x, y)).length, c = shCells(Q, 16);
+    const cx = c.reduce((a, p) => a + p[0], 0) / c.length, cy = c.reduce((a, p) => a + p[1], 0) / c.length;
+    const score = over * 1e6 - Math.hypot(cx - mx, cy - my);
+    if (!best || score > best.score) best = { q, score };
+  });
+  const tgt = best.q, D = shGlobal(tgt);
+  shFitting = true; document.getElementById("sh-fit").disabled = true;
+  const cap2 = document.getElementById("caption2");
+  const nameOf = (it) => `<span style="color:${COLS[it.w]};font-weight:700">${WAYS[sh.n][it.w][0]}</span>`;
+  cap2.innerHTML = `Cutting the part from ${nameOf(src)} into small bits and fitting it into the part from ${nameOf(tgt)}…`;
+  const T = 9, a1 = shCells(S, 3).length, a2 = shCells(D, 3).length, equal = Math.abs(a1 - a2) / a2 < .03;
+  let from = shCells(S, T), to = shCells(D, T);
+  if (equal) { while (from.length > to.length) from.splice(Math.floor(from.length / 2), 1); while (to.length > from.length) to.splice(Math.floor(to.length / 2), 1); }
+  const box = (P) => { const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]); return [Math.min(...xs), Math.min(...ys), (Math.max(...xs) - Math.min(...xs)) || 1, (Math.max(...ys) - Math.min(...ys)) || 1]; };
+  const order = (P) => { const [x0, y0, w, h] = box(P); return [...P].sort((p, q) => Math.round((p[1] - y0) / h * 30) - Math.round((q[1] - y0) / h * 30) || (p[0] - x0) / w - (q[0] - x0) / w); };
+  from = order(from); to = order(to);
+  const outline = el("polygon", { points: shPoints(D), fill: "none", stroke: COLS[tgt.w], "stroke-width": 6, "stroke-linejoin": "round" }, svg2);
+  const layer = el("g", { opacity: .7 }, svg2), bits = from.map(([x, y]) => el("rect", { x: x - T / 2 - .5, y: y - T / 2 - .5, width: T + 1, height: T + 1, fill: COLS[src.w] }, layer));
+  src.shade.setAttribute("opacity", 0);
+  svg2.appendChild(outline);
+  const n = from.length, HOLD = 1500, SPREAD = 7000, FLY = 6000, run = shRun;
+  await tween(HOLD + SPREAD + FLY, (pAll) => {
+    const t = pAll * (HOLD + SPREAD + FLY);
+    bits.forEach((r, i) => {
+      const d = to[i]; if (!d) return;
+      const e = ease(clamp01((t - HOLD - (i / Math.max(1, n - 1)) * SPREAD) / FLY)), lift = Math.sin(Math.PI * e) * -35;
+      r.setAttribute("x", from[i][0] + (d[0] - from[i][0]) * e - T / 2 - .5);
+      r.setAttribute("y", from[i][1] + (d[1] - from[i][1]) * e + lift - T / 2 - .5);
+    });
+  });
+  if (run !== shRun) { shFitting = false; return; }   // redrawn meanwhile
+  if (equal) {
+    const clean = el("polygon", { points: shPoints(D), fill: COLS[src.w], "fill-opacity": .7, opacity: 0 }, svg2);
+    svg2.appendChild(outline);
+    await tween(900, (p) => { clean.setAttribute("opacity", p); layer.setAttribute("opacity", .7 * (1 - p)); });
+    layer.remove();
+  }
+  shFitting = false;
+  cap2.innerHTML = `Does the part from ${nameOf(src)} fit exactly into the part from ${nameOf(tgt)}? Is anything left over, or is there a gap?`;
+}
+document.getElementById("sh-fit").onclick = shCutToFit;
+
+// ---------- draw my own cuts ----------
+// The square is an 8 x 8 grid of cells. Each cell is split by its two diagonals into 4 small triangles (N, E, S, W).
+// Cuts run along grid lines or corner to corner across cells, so every part is made of whole small triangles.
+// That lets the page break one part into pieces and fit them, turned if needed, into another part.
+const cv = document.getElementById("draw"), g2 = cv.getContext("2d");
+// The board holds one or two wholes (rectangles of small squares). Cuts only work inside a whole.
+const DS0 = 60, CELL = 105;
+let GC = 8, GR = 8, DW = 960, DH = 960, NU = 256, LW = 480, LH = 480;
+let WHOLES = [{ c0: 0, r0: 0, w: 8, h: 8 }];
+const wholeCfg = { count: 1, sizes: [[8, 8], [4, 4]] };
+let WL = ["Whole A", "Whole B"], WFILL = "#FBE3B8";
+const wholeOf = (c, r) => WHOLES.findIndex((W) => c >= W.c0 && c < W.c0 + W.w && r >= W.r0 && r < W.r0 + W.h);
+const PAL = ["#2F62B0", "#1F7A55", "#C2570C", "#9B3FB5", "#B07D0B", "#0E7C86"];
+// how long one whole fit takes, start to finish, at each speed
+const TARGETS = { slow: 30000, medium: 18000, fast: 9000 };
+function baseOf(A) {  // the length each animation was designed at
+  if (A.plan) return 1200 + A.plan.stages.length * 4100;
+  if (A.flow) return 9200;
+  if (A.rigid) return 4800;
+  const n = A.moves.length, gap = n > 1 ? Math.min(1400, 9000 / (n - 1)) : 0;
+  return 2200 + 800 + (n - 1) * gap + 2200 + 900;
+}
+const rate = (A) => baseOf(A) / TARGETS[dr.speed];
+const dr = { speed: "slow", lines: [], taps: [], sizes: false, drag: null, next: 0, anim: null, msg: "", history: [], tool: "cut", pieces: [], sel: null };
+let unitRegion = new Int32Array(NU), regions = [];
+const U = (c, r, q) => (r * GC + c) * 4 + q;           // q: 0 N, 1 E, 2 S, 3 W
+const cellOf = (u) => { const k = u >> 2; return [k % GC, (k / GC) | 0, u & 3]; };
+const cellCentre = (c, r) => [DS0 + (c + .5) * CELL, DS0 + (r + .5) * CELL];
+function unitPoly(u) {
+  const [c, r, q] = cellOf(u), x = DS0 + c * CELL, y = DS0 + r * CELL;
+  const TL = [x, y], TR = [x + CELL, y], BR = [x + CELL, y + CELL], BL = [x, y + CELL], M = [x + CELL / 2, y + CELL / 2];
+  return [[TL, TR], [TR, BR], [BR, BL], [BL, TL]][q].concat([M]);
+}
+const centroid = (poly) => [(poly[0][0] + poly[1][0] + poly[2][0]) / 3, (poly[0][1] + poly[1][1] + poly[2][1]) / 3];
+function unitAt(x, y) {
+  const c = Math.floor((x - DS0) / CELL), r = Math.floor((y - DS0) / CELL);
+  if (c < 0 || r < 0 || c >= GC || r >= GR || wholeOf(c, r) < 0) return -1;
+  const [mx, my] = cellCentre(c, r), dx = x - mx, dy = y - my;
+  return U(c, r, Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+}
+
+// ---- set up the board for one or two wholes ----
+function sizeCanvas() {
+  const stage = cv.parentElement, sb = document.getElementById("story"), avail = Math.max(200, stage.clientWidth - 16);
+  const availH = Math.max(240, innerHeight - 60 - (sb.hidden ? 0 : sb.offsetHeight + 8));
+  const k = Math.min(avail / DW, availH / DH);
+  cv.style.width = Math.round(DW * k) + "px"; cv.style.height = Math.round(DH * k) + "px";
+}
+function setBoard() {
+  const sz = wholeCfg.sizes.slice(0, wholeCfg.count);
+  GR = Math.max(...sz.map((s) => s[1]));
+  let c = 0; WHOLES = sz.map(([w, h]) => { const W = { c0: c, r0: Math.floor((GR - h) / 2), w, h }; c += w + 1; return W; });
+  GC = c - 1;
+  DW = DS0 * 2 + GC * CELL; DH = DS0 * 2 + GR * CELL; NU = GC * GR * 4; LW = DW / 2; LH = DH / 2;
+  cv.width = DW; cv.height = DH; lab.width = LW; lab.height = LH;
+  unitRegion = new Int32Array(NU); plabels = new Int32Array(LW * LH);
+  if (typeof resetAnim === "function") { resetAnim(); clearPieces(); }
+  dr.lines = []; dr.taps = []; dr.next = 0; dr.history = []; dr.msg = "";
+  computeRegions(); sizeCanvas(); renderDraw();
+}
+function wholeRows() {
+  const box = document.getElementById("whRows"); box.innerHTML = "";
+  const opts = (v) => [2, 3, 4, 5, 6, 7, 8].map((n) => `<option value="${n}"${n === v ? " selected" : ""}>${n}</option>`).join("");
+  for (let k = 0; k < wholeCfg.count; k++) {
+    const [w, h] = wholeCfg.sizes[k], span = document.createElement("span");
+    span.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-right:10px";
+    span.innerHTML = `${wholeCfg.count > 1 ? `Whole ${"AB"[k]}:` : "Size:"} <select id="ww${k}" aria-label="Whole ${"AB"[k]} width">${opts(w)}</select> across × <select id="wh${k}h" aria-label="Whole ${"AB"[k]} height">${opts(h)}</select> down`;
+    box.appendChild(span);
+    span.querySelector(`#ww${k}`).onchange = (e) => { wholeCfg.sizes[k][0] = +e.target.value; setBoard(); };
+    span.querySelector(`#wh${k}h`).onchange = (e) => { wholeCfg.sizes[k][1] = +e.target.value; setBoard(); };
+  }
+}
+function setWholeCount(n) {
+  wholeCfg.count = n; [1, 2].forEach((i) => document.getElementById(`wh${i}`).setAttribute("aria-pressed", String(i === n)));
+  wholeRows(); setBoard();
+}
+wholeRows();
+document.getElementById("wh1").onclick = () => setWholeCount(1);
+document.getElementById("wh2").onclick = () => setWholeCount(2);
+addEventListener("resize", () => { if (sh.mode === "draw") sizeCanvas(); });
+// ---- student mode: a short story sets up the wholes, and only the student buttons show ----
+const STORIES = [
+  { text: "Ali and Mei each have a chocolate bar. Ali's bar is bigger. They each cut their bar into 2 equal parts. Ali says, “My half is the same as your half!” Is Ali right?",
+    sizes: [[8, 4], [4, 4]], labels: ["Ali's chocolate", "Mei's chocolate"], fill: "#E2B48F" },
+  { text: "Sara and Ben have the same cake. Sara cuts hers into 4 equal strips. Ben cuts his into 4 equal squares. Ben says, “My piece is bigger!” Is Ben right?",
+    sizes: [[8, 8], [8, 8]], labels: ["Sara's cake", "Ben's cake"], fill: "#F9C9D8" },
+  { text: "Kumar cuts his toast from corner to corner to share with his sister. His sister says, “Your piece is bigger!” Is she right?",
+    sizes: [[6, 6]], labels: ["Kumar's toast"], fill: "#F2D29B" },
+  { text: "Lina's paper is long. Raj's paper is tall. Each paper is cut into 2 equal parts. Do Lina and Raj get the same amount of paper?",
+    sizes: [[8, 4], [4, 8]], labels: ["Lina's paper", "Raj's paper"], fill: "#DCE8F3" },
+  { text: "Mum cuts one tray of kueh into 4 parts for 4 children. Two pieces are rectangles and two pieces are triangles. Dan says, “The triangles are smaller, so it is not fair!” Is Dan right? Are the 4 parts equal?",
+    sizes: [[8, 4]], labels: ["Mum's kueh"], fill: "#BFE3B4",
+    lines: [{ a: [4, 0], b: [4, 4] }, { a: [0, 0], b: [4, 4] }, { a: [4, 2], b: [8, 2] }] },
+  { text: "Siti wants to cut her square pizza into 4 equal parts. But the parts must not all be the same shape! Can you help Siti? How do you know your parts are equal?",
+    sizes: [[8, 8]], labels: ["Siti's pizza"], fill: "#F6D7A7" },
+];
+const stu = { on: false, story: 0, saved: null };
+function showStory(i) {
+  stu.story = i; const S = STORIES[i], box = document.getElementById("story");
+  box.innerHTML = `<p>${S.text}</p><div class="seg" role="group" aria-label="Story">${STORIES.map((_, k) => `<button data-st="${k}" aria-pressed="${k === i}">Story ${k + 1}</button>`).join("")}</div>`;
+  box.querySelectorAll("button").forEach((b) => (b.onclick = () => showStory(+b.dataset.st)));
+  wholeCfg.count = S.sizes.length; wholeCfg.sizes = S.sizes.map((x) => [...x]).concat([[4, 4]]).slice(0, 2);
+  WL = S.labels; WFILL = S.fill; setBoard();
+  if (S.lines) { dr.lines = S.lines.map((l) => ({ a: [...l.a], b: [...l.b] })); computeRegions(); renderDraw(); }
+}
+function setStudent(on) {
+  stu.on = on; document.getElementById("stu").setAttribute("aria-pressed", String(on));
+  document.getElementById("stu").textContent = on ? "Teacher mode" : "Student mode";
+  document.body.classList.toggle("student", on);
+  document.getElementById("story").hidden = !on;
+  if (on) { stu.saved = { count: wholeCfg.count, sizes: wholeCfg.sizes.map((x) => [...x]) }; showStory(stu.story); }
+  else {
+    if (stu.saved) { wholeCfg.count = stu.saved.count; wholeCfg.sizes = stu.saved.sizes; }
+    WL = ["Whole A", "Whole B"]; WFILL = "#FBE3B8";
+    [1, 2].forEach((i) => document.getElementById(`wh${i}`).setAttribute("aria-pressed", String(i === wholeCfg.count)));
+    wholeRows(); setBoard();
+  }
+}
+document.getElementById("stu").onclick = () => setStudent(!stu.on);
+
+
+// ---- which parts the cuts make ----
+// Cuts that go across, down, or corner to corner of the small squares give parts made of exact little triangles,
+// which can be broken up and refitted. Any other slant is handled pixel by pixel: parts can still be coloured,
+// measured and moved onto a part of the same shape, but not broken up.
+let exact = true;
+const friendly = ({ a, b }) => { const dx = b[0] - a[0], dy = b[1] - a[1]; return dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy); };
+function computeRegions() {
+  exact = dr.lines.every(friendly);
+  paintCache.clear();
+  if (exact) computeUnits(); else computePixels();
+}
+const lab = document.createElement("canvas"); lab.width = LW; lab.height = LH;
+const lc = lab.getContext("2d", { willReadFrequently: true });
+let plabels = new Int32Array(LW * LH);
+function computePixels() {
+  const s0 = DS0 / 2, hc = CELL / 2;
+  lc.fillStyle = "#000"; lc.fillRect(0, 0, LW, LH); lc.fillStyle = "#fff";
+  WHOLES.forEach((W) => lc.fillRect(s0 + W.c0 * hc, s0 + W.r0 * hc, W.w * hc, W.h * hc));
+  lc.strokeStyle = "#000"; lc.lineWidth = 3; lc.lineCap = "round";
+  dr.lines.forEach(({ a, b }) => { lc.beginPath(); lc.moveTo(s0 + a[0] * hc, s0 + a[1] * hc); lc.lineTo(s0 + b[0] * hc, s0 + b[1] * hc); lc.stroke(); });
+  const d = lc.getImageData(0, 0, LW, LH).data;
+  plabels.fill(-1); regions = []; let white = 0;
+  for (let i = 0; i < LW * LH; i++) {
+    if (plabels[i] >= 0 || d[i * 4] < 128) continue;
+    const id = regions.length, stack = [i]; let count = 0, sx = 0, sy = 0; plabels[i] = id;
+    while (stack.length) {
+      const q = stack.pop(), x = q % LW, y = (q / LW) | 0; count++; sx += x; sy += y;
+      for (const nq of [q - 1, q + 1, q - LW, q + LW]) {
+        if (nq < 0 || nq >= LW * LH || plabels[nq] >= 0 || d[nq * 4] < 128 || Math.abs((nq % LW) - x) > 1) continue;
+        plabels[nq] = id; stack.push(nq);
+      }
+    }
+    white += count; regions.push({ id, count, cx: sx / count * 2, cy: sy / count * 2 });
+  }
+  const cell = hc * hc, scale = WHOLES.reduce((t, W) => t + W.w * W.h, 0) * cell / Math.max(1, white);
+  regions = regions.filter((R) => R.count * scale / cell > .05 || true);
+  regions.forEach((R) => (R.squares = R.count * scale / cell));
+}
+function regionAt(x, y) {
+  if (exact) { const u = unitAt(x, y); return u < 0 ? -1 : unitRegion[u]; }
+  const lx = Math.round(x / 2), ly = Math.round(y / 2);
+  for (let rad = 0; rad <= 3; rad++) for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
+    const X = lx + dx, Y = ly + dy; if (X < 0 || Y < 0 || X >= LW || Y >= LH) continue;
+    const v = plabels[Y * LW + X]; if (v >= 0) return v;
+  }
+  return -1;
+}
+// painting a part: little triangles, or a cached picture of its pixels
+const paintCache = new Map();
+function paintRegion(r, col, alpha) {
+  if (exact) { regions[r].units.forEach((u) => fillPoly(unitPoly(u), col, alpha)); return; }
+  g2.drawImage(maskCanvas(r, col, alpha, false), 0, 0, LW, LH, 0, 0, DW, DH);
+}
+function maskCanvas(r, col, alpha, edgeOnly, thick = 2) {
+  const key = `${r}|${col}|${alpha}|${edgeOnly}|${thick}`;
+  if (paintCache.has(key)) return paintCache.get(key);
+  const c = document.createElement("canvas"); c.width = LW; c.height = LH; const x = c.getContext("2d"), img = x.createImageData(LW, LH);
+  const [R, G, B] = [1, 3, 5].map((o) => parseInt(col.slice(o, o + 2), 16)), A = Math.round(alpha * 255);
+  const inR = (i) => plabels[i] === r;
+  for (let i = 0; i < LW * LH; i++) {
+    let on = inR(i);
+    if (edgeOnly) {
+      // a ring just inside the part's edge
+      on = false;
+      if (inR(i)) { const X = i % LW, Y = (i / LW) | 0;
+        outer: for (let dy = -thick; dy <= thick; dy++) for (let dx = -thick; dx <= thick; dx++) { const XX = X + dx, YY = Y + dy; if (XX < 0 || YY < 0 || XX >= LW || YY >= LH || plabels[YY * LW + XX] !== r) { on = true; break outer; } } }
+    }
+    if (on) { img.data[i * 4] = R; img.data[i * 4 + 1] = G; img.data[i * 4 + 2] = B; img.data[i * 4 + 3] = A; }
+  }
+  x.putImageData(img, 0, 0); paintCache.set(key, c); return c;
+}
+
+// ---- which small triangles are joined, given the cuts ----
+function computeUnits() {
+  const blocked = new Set(), key = (a, b) => a < b ? `${a}-${b}` : `${b}-${a}`;
+  for (const { a, b } of dr.lines) {
+    const di = Math.sign(b[0] - a[0]), dj = Math.sign(b[1] - a[1]), L = Math.max(Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1]));
+    let [i, j] = a;
+    for (let k = 0; k < L; k++, i += di, j += dj) {
+      if (dj === 0) { const c = Math.min(i, i + di); if (j > 0 && j < GR && c >= 0 && c < GC) blocked.add(key(U(c, j - 1, 2), U(c, j, 0))); }
+      else if (di === 0) { const r = Math.min(j, j + dj); if (i > 0 && i < GC && r >= 0 && r < GR) blocked.add(key(U(i - 1, r, 1), U(i, r, 3))); }
+      else {
+        const c = Math.min(i, i + di), r = Math.min(j, j + dj);
+        if (c < 0 || r < 0 || c >= GC || r >= GR) continue;
+        if (di === dj) { blocked.add(key(U(c, r, 3), U(c, r, 0))); blocked.add(key(U(c, r, 1), U(c, r, 2))); }   // top-left to bottom-right
+        else { blocked.add(key(U(c, r, 0), U(c, r, 1))); blocked.add(key(U(c, r, 2), U(c, r, 3))); }            // top-right to bottom-left
+      }
+    }
+  }
+  const parent = Array.from({ length: NU }, (_, i) => i);
+  const find = (x) => { while (parent[x] !== x) x = parent[x] = parent[parent[x]]; return x; };
+  const join = (a, b) => { if (!blocked.has(key(a, b))) parent[find(a)] = find(b); };
+  for (let r = 0; r < GR; r++) for (let c = 0; c < GC; c++) {
+    const w = wholeOf(c, r); if (w < 0) continue;
+    for (let q = 0; q < 4; q++) join(U(c, r, q), U(c, r, (q + 1) % 4));
+    if (c + 1 < GC && wholeOf(c + 1, r) === w) join(U(c, r, 1), U(c + 1, r, 3));
+    if (r + 1 < GR && wholeOf(c, r + 1) === w) join(U(c, r, 2), U(c, r + 1, 0));
+  }
+  const ids = new Map(); regions = [];
+  for (let u = 0; u < NU; u++) {
+    const [uc, ur] = cellOf(u); if (wholeOf(uc, ur) < 0) { unitRegion[u] = -1; continue; }
+    const root = find(u);
+    if (!ids.has(root)) { ids.set(root, regions.length); regions.push({ id: regions.length, units: [] }); }
+    unitRegion[u] = ids.get(root); regions[ids.get(root)].units.push(u);
+  }
+  regions.forEach((R) => {
+    let sx = 0, sy = 0; R.units.forEach((u) => { const [x, y] = centroid(unitPoly(u)); sx += x; sy += y; });
+    R.cx = sx / R.units.length; R.cy = sy / R.units.length; R.squares = R.units.length / 4; // 1 small square (between 4 dots) = 4 triangles; the whole is 64
+  });
+}
+
+// colour of each tapped part, most recent last
+function coloured() {
+  const out = [], seen = new Set();
+  dr.taps.forEach((t) => { const r = regionAt(t.x, t.y); if (r >= 0 && !seen.has(r)) { seen.add(r); out.push({ r, col: t.col }); } });
+  return out;
+}
+
+// ---- drawing ----
+const half = (v) => { const h = Math.round(v * 2) / 2, w = Math.floor(h); return h === w ? String(w) : (w ? `${w}½` : "½"); };
+const fillPoly = (pts, col, alpha) => { g2.globalAlpha = alpha; g2.fillStyle = col; g2.beginPath(); pts.forEach(([x, y], i) => (i ? g2.lineTo(x, y) : g2.moveTo(x, y))); g2.closePath(); g2.fill(); g2.globalAlpha = 1; };
+function renderDraw(now) {
+  if (sh.mode !== "draw") return;
+  g2.clearRect(0, 0, DW, DH);
+  const WR = (W) => [DS0 + W.c0 * CELL, DS0 + W.r0 * CELL, W.w * CELL, W.h * CELL];
+  g2.fillStyle = WFILL; WHOLES.forEach((W) => g2.fillRect(...WR(W)));
+  if (WHOLES.length > 1 || stu.on) {
+    g2.font = "700 34px Andika, Verdana, sans-serif"; g2.textAlign = "left"; g2.textBaseline = "alphabetic"; g2.fillStyle = "#3A2A33";
+    WHOLES.forEach((W, k) => g2.fillText(WL[k], DS0 + W.c0 * CELL, DS0 + W.r0 * CELL - 14));
+  }
+  const cols = coloured(), A = dr.anim;
+  cols.forEach(({ r, col }) => {
+    if (A && r === A.from) return;                       // the moving part is drawn by the animation
+    const a = A && r === A.to ? .5 : .6;
+    paintRegion(r, col, a);
+  });
+  dr.pieces.forEach((pc) => paintRegion(pc.r, "#FFFFFF", .6));
+  if (A) {
+    paintRegion(A.from, "#FFFFFF", .55);   // where it came from
+  }
+  if (sh.grid) {
+    g2.save(); g2.strokeStyle = "rgba(58,42,51,.5)"; g2.lineWidth = 2; g2.setLineDash([10, 10]);
+    WHOLES.forEach((W) => {
+      const [x0, y0, w, h] = WR(W);
+      for (let i = 1; i < W.w; i++) { const v = x0 + i * CELL; g2.beginPath(); g2.moveTo(v, y0); g2.lineTo(v, y0 + h); g2.stroke(); }
+      for (let j = 1; j < W.h; j++) { const v = y0 + j * CELL; g2.beginPath(); g2.moveTo(x0, v); g2.lineTo(x0 + w, v); g2.stroke(); }
+    });
+    g2.restore();
+  }
+  g2.strokeStyle = "#7A3B52"; g2.lineWidth = 7; g2.lineCap = "round";
+  const P = (i, j) => [DS0 + i * CELL, DS0 + j * CELL];
+  g2.save(); g2.beginPath(); WHOLES.forEach((W) => g2.rect(...WR(W))); g2.clip();   // cuts only show inside a whole
+  dr.lines.forEach(({ a, b }) => { g2.beginPath(); g2.moveTo(...P(...a)); g2.lineTo(...P(...b)); g2.stroke(); });
+  g2.restore();
+  g2.strokeStyle = "#3A2A33"; g2.lineWidth = 8; WHOLES.forEach((W) => g2.strokeRect(...WR(W)));
+  if (!A) {
+    g2.fillStyle = "rgba(58,42,51,.45)";
+    WHOLES.forEach((W) => { for (let i = W.c0; i <= W.c0 + W.w; i++) for (let j = W.r0; j <= W.r0 + W.h; j++) { g2.beginPath(); g2.arc(...P(i, j), 6, 0, 7); g2.fill(); } });
+  }
+  dr.pieces.forEach((pc) => outlineRegion(regions[pc.r], pc.col, 5, [14, 10]));
+  drawPieces();
+  if (A) {
+    drawMoving(now ?? performance.now());
+    // the part being filled keeps a bold outline on top, so the overlap shows
+    const toCol = (cols.find((c) => c.r === A.to) || {}).col || "#3A2A33";
+    outlineRegion(regions[A.to], toCol, 9, []);
+    outlineRegion(regions[A.from], A.col, 5, [14, 10]);
+  }
+  if (dr.drag && dr.drag.dot) {
+    const end = nearestDot(dr.drag.x, dr.drag.y), [x2, y2] = end ? P(...end) : [dr.drag.x, dr.drag.y];
+    g2.save(); g2.strokeStyle = "#D9467A"; g2.lineWidth = 6; g2.setLineDash([16, 12]); g2.beginPath(); g2.moveTo(...P(...dr.drag.dot)); g2.lineTo(x2, y2); g2.stroke(); g2.restore();
+    g2.fillStyle = "#D9467A"; g2.beginPath(); g2.arc(...P(...dr.drag.dot), 12, 0, 7); g2.fill();
+  }
+  if (dr.sizes && !A) {
+    g2.font = "700 40px Andika, Verdana, sans-serif"; g2.textAlign = "center"; g2.textBaseline = "middle";
+    regions.forEach((R) => { if (R.squares < .2) return; const t = (exact || Math.abs(R.squares - Math.round(R.squares * 2) / 2) < .08 ? "" : "\u2248") + half(R.squares); g2.lineWidth = 8; g2.strokeStyle = "#FFFDF8"; g2.strokeText(t, R.cx, R.cy); g2.fillStyle = "#3A2A33"; g2.fillText(t, R.cx, R.cy); });
+  }
+  const capEl = document.getElementById("caption2");
+  if (!A && dr.pieces.length) capEl.innerHTML = "Do the parts cover each other exactly? Does anything stick out? Is there a gap?";
+  else if (A) capEl.innerHTML = A.done ? "Does it fit exactly? What does that tell you?" : (A.phase || "");
+  else capEl.innerHTML = dr.msg || (dr.lines.length
+    ? (WHOLES.length > 1 ? `The wholes are cut into ${regions.length} parts. Which parts are the same size? How do you know?` : `The whole is cut into ${regions.length} parts. Are they equal parts? How do you know?`) + (dr.sizes ? " &nbsp;The numbers count small squares." : "")
+    : (WHOLES.length > 1 ? "Drag from dot to dot to cut the wholes." : "Drag from dot to dot to cut the whole."));
+  document.getElementById("dr-check").disabled = !!A || cols.length < 2;
+  document.getElementById("dr-back").disabled = !A && !dr.pieces.length;
+}
+
+// the outside edge of a part (edges used by only one of its triangles)
+function regionEdges(R) {
+  const seen = new Map(), k = ([x, y]) => `${Math.round(x)},${Math.round(y)}`;
+  R.units.forEach((u) => { const p = unitPoly(u); for (let i = 0; i < 3; i++) { const a = p[i], b = p[(i + 1) % 3], key = [k(a), k(b)].sort().join("|"); seen.set(key, seen.has(key) ? null : [a, b]); } });
+  return [...seen.values()].filter(Boolean);
+}
+function outlineRegion(R, col, width, dash) {
+  if (!exact) { g2.drawImage(maskCanvas(R.id, col, dash.length ? .7 : 1, true, Math.max(1, Math.round(width / 4))), 0, 0, LW, LH, 0, 0, DW, DH); return; }
+  g2.save(); g2.strokeStyle = col; g2.lineWidth = width; g2.lineCap = "round"; g2.setLineDash(dash);
+  g2.beginPath(); regionEdges(R).forEach(([a, b]) => { g2.moveTo(...a); g2.lineTo(...b); }); g2.stroke(); g2.restore();
+}
+
+// ---- parts you drag yourself ----
+// A lifted part turns and flips about a dot near its middle, and lands on whole steps of the dot grid,
+// so a part of the same shape can always be laid exactly on top of another.
+const pieceInv = (pc, [x, y]) => { let v = rot([x - pc.P[0] - pc.tx, y - pc.P[1] - pc.ty], -pc.k * Math.PI / 2); if (pc.flip) v[0] = -v[0]; return [v[0] + pc.P[0], v[1] + pc.P[1]]; };
+function drawPieces() {
+  dr.pieces.forEach((pc) => {
+    g2.save();
+    g2.translate(pc.P[0] + pc.tx, pc.P[1] + pc.ty); g2.rotate(pc.k * Math.PI / 2); if (pc.flip) g2.scale(-1, 1); g2.translate(-pc.P[0], -pc.P[1]);
+    paintRegion(pc.r, pc.col, .55);
+    outlineRegion(regions[pc.r], pc === dr.sel ? "#3A2A33" : pc.col, pc === dr.sel ? 7 : 5, []);
+    g2.restore();
+  });
+}
+function pieceAt(x, y) {
+  for (let i = dr.pieces.length - 1; i >= 0; i--) { const pc = dr.pieces[i], [ox, oy] = pieceInv(pc, [x, y]); if (regionAt(ox, oy) === pc.r) return pc; }
+  return null;
+}
+function liftAt(x, y) {
+  const hit = pieceAt(x, y); if (hit) return hit;
+  const r = regionAt(x, y); if (r < 0 || dr.pieces.some((q) => q.r === r)) return null;
+  let col = (coloured().find((c) => c.r === r) || {}).col;
+  if (!col) { col = PAL[dr.next++ % PAL.length]; dr.taps.push({ x, y, col }); }
+  const R = regions[r], P = [DS0 + Math.round((R.cx - DS0) / CELL) * CELL, DS0 + Math.round((R.cy - DS0) / CELL) * CELL];
+  const pc = { r, col, P, k: 0, flip: false, tx: 0, ty: 0 };
+  dr.pieces.push(pc); dr.history.push({ type: "lift", pc }); return pc;
+}
+const snapPiece = (pc) => { pc.tx = Math.round(pc.tx / CELL) * CELL; pc.ty = Math.round(pc.ty / CELL) * CELL; };
+function selectPiece(pc) { dr.sel = pc; document.getElementById("pc-turn").disabled = !pc; document.getElementById("pc-flip").disabled = !pc; }
+function setTool(t) {
+  dr.tool = t; document.getElementById("tool-cut").setAttribute("aria-pressed", String(t === "cut")); document.getElementById("tool-move").setAttribute("aria-pressed", String(t === "move"));
+  document.getElementById("moveHint").hidden = t !== "move"; document.getElementById("drawHint").hidden = t === "move";
+  cv.style.cursor = t === "move" ? "grab" : "crosshair"; renderDraw();
+}
+const clearPieces = () => { dr.pieces = []; selectPiece(null); dr.history = dr.history.filter((h) => h.type !== "lift"); };
+
+// ---- fitting one part into another ----
+const rot = ([x, y], a) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
+// 1. same shape? try every turn and flip that maps the first part exactly onto the second
+function rigidFit(fromR, toR) {
+  const A = regions[fromR], B = regions[toR];
+  if (A.units.length !== B.units.length) return null;
+  const target = new Set(B.units);
+  for (const flip of [false, true]) for (let k = 0; k < 4; k++) {
+    const th = k * Math.PI / 2; let ok = true;
+    for (const u of A.units) {
+      let [x, y] = centroid(unitPoly(u)); x -= A.cx; y -= A.cy; if (flip) x = -x;
+      [x, y] = rot([x, y], th);
+      if (!target.has(unitAt(x + B.cx, y + B.cy))) { ok = false; break; }
+    }
+    if (ok) return { flip, th };
+  }
+  return null;
+}
+// 2. different shapes: break into whole cells, half cells and quarter cells, and fill the other part
+function chunks(units) {
+  const byCell = new Map();
+  units.forEach((u) => { const k = u >> 2; if (!byCell.has(k)) byCell.set(k, []); byCell.get(k).push(u & 3); });
+  const full = [], halves = [], quarters = [];
+  byCell.forEach((qs, k) => {
+    const c = k % GC, r = (k / GC) | 0, has = (q) => qs.includes(q);
+    if (qs.length === 4) { full.push({ c, r }); return; }
+    let left = [...qs];
+    for (let o = 0; o < 4 && left.length >= 2; o++) if (left.includes(o) && left.includes((o + 1) % 4)) { halves.push({ c, r, o }); left = left.filter((q) => q !== o && q !== (o + 1) % 4); }
+    left.forEach((q) => quarters.push({ c, r, q }));
+  });
+  return { full, halves, quarters };
+}
+function dissectFit(fromR, toR) {
+  const A = chunks(regions[fromR].units), B = chunks(regions[toR].units), moves = [];
+  const corners = (c, r) => { const x = DS0 + c * CELL, y = DS0 + r * CELL; return [[x, y], [x + CELL, y], [x + CELL, y + CELL], [x, y + CELL]]; };
+  const polyOf = (c, r, qs) => { const K = corners(c, r), M = cellCentre(c, r);
+    return qs.length === 4 ? K : qs.length === 2 ? [K[qs[0]], K[(qs[0] + 1) % 4], K[(qs[0] + 2) % 4]] : [K[qs[0]], K[(qs[0] + 1) % 4], M]; };
+  // 1. big blocks first: whole cells that can slide across together without turning
+  for (let round = 0; round < 4; round++) {
+    let best = null;
+    for (const a of A.full) for (const b of B.full) {
+      const dc = b.c - a.c, dr_ = b.r - a.r;
+      const hits = A.full.filter((x) => B.full.some((y) => y.c === x.c + dc && y.r === x.r + dr_));
+      if (!best || hits.length > best.hits.length) best = { dc, dr: dr_, hits };
+    }
+    if (!best || best.hits.length < 2) break;
+    const { dc, dr: d2, hits } = best;
+    const polys = hits.map(({ c, r }) => corners(c, r));
+    const cx = hits.reduce((s, { c, r }) => s + cellCentre(c, r)[0], 0) / hits.length, cy = hits.reduce((s, { c, r }) => s + cellCentre(c, r)[1], 0) / hits.length;
+    moves.push({ polys, from: [cx, cy], to: [cx + dc * CELL, cy + d2 * CELL], k: 0, units: hits.flatMap(({ c, r }) => [0, 1, 2, 3].map((q) => U(c, r, q))) });
+    A.full = A.full.filter((x) => !hits.includes(x));
+    B.full = B.full.filter((y) => !hits.some((x) => y.c === x.c + dc && y.r === x.r + d2));
+  }
+  // 2. what is left is broken into single cells, half cells and quarter cells, turned to fit
+  const add = (src, qs, dst, k) => moves.push({ polys: [polyOf(src.c, src.r, qs)], from: cellCentre(src.c, src.r), to: cellCentre(dst.c, dst.r), k, units: qs.map((q) => U(src.c, src.r, q)) });
+  while (A.full.length && B.full.length) { const a = A.full.pop(), b = B.full.pop(); add(a, [0, 1, 2, 3], b, 0); }
+  const split = (S) => { S.full.forEach(({ c, r }) => { S.halves.push({ c, r, o: 0 }, { c, r, o: 2 }); }); S.full = []; };
+  split(A); split(B);
+  while (A.halves.length && B.halves.length) { const a = A.halves.pop(), b = B.halves.pop(); add(a, [a.o, (a.o + 1) % 4], b, (b.o - a.o + 4) % 4); }
+  const quarter = (S) => { S.halves.forEach(({ c, r, o }) => S.quarters.push({ c, r, q: o }, { c, r, q: (o + 1) % 4 })); S.halves = []; };
+  quarter(A); quarter(B);
+  while (A.quarters.length && B.quarters.length) { const a = A.quarters.pop(), b = B.quarters.pop(); add(a, [a.q], b, (b.q - a.q + 4) % 4); }
+  return moves;
+}
+
+// same shape, checked pixel by pixel: try every turn and flip about the part's middle
+function pixelFit(fromR, toR) {
+  const A = regions[fromR], B = regions[toR];
+  if (Math.abs(A.count - B.count) / B.count > .05) return null;
+  const ax = A.cx / 2, ay = A.cy / 2, bx = B.cx / 2, by = B.cy / 2, pts = [];
+  for (let i = 0; i < LW * LH; i += 3) if (plabels[i] === fromR) pts.push([i % LW - ax, ((i / LW) | 0) - ay]);
+  let best = null;
+  for (const flip of [false, true]) for (let k = 0; k < 4; k++) {
+    const th = k * Math.PI / 2; let hit = 0;
+    for (const [x0, y0] of pts) { const [x, y] = rot([flip ? -x0 : x0, y0], th); const X = Math.round(x + bx), Y = Math.round(y + by);
+      if (X >= 0 && Y >= 0 && X < LW && Y < LH) { const v = plabels[Y * LW + X]; if (v === toR || v === -1) hit++; } }
+    const score = hit / pts.length; if (!best || score > best.score) best = { flip, th, score };
+  }
+  return best && best.score > .97 ? best : null;
+}
+// ---------- cutting a rectangle into a triangle (and back), or a rectangle into a strip ----------
+// Works for any cuts, slanted or not, when one part is a rectangle and the other a triangle or rectangle of the same size.
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1]], addv = (a, b) => [a[0] + b[0], a[1] + b[1]], mul = (a, k) => [a[0] * k, a[1] * k];
+const mid = (a, b) => mul(addv(a, b), .5), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const polyArea = (P) => Math.abs(P.reduce((s, p, i) => { const q = P[(i + 1) % P.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+const polyCentre = (P) => mul(P.reduce((s, p) => addv(s, p), [0, 0]), 1 / P.length);
+function snapPoints() {
+  const pts = [], P = (i, j) => [DS0 + i * CELL, DS0 + j * CELL];
+  for (let i = 0; i <= GC; i++) for (let j = 0; j <= GR; j++) pts.push(P(i, j));
+  const segs = dr.lines.map(({ a, b }) => [P(...a), P(...b)]);
+  for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+    const [p, p2] = segs[i], [q, q2] = segs[j], r = sub(p2, p), s = sub(q2, q), d = r[0] * s[1] - r[1] * s[0];
+    if (Math.abs(d) < 1e-9) continue;
+    const t = ((q[0] - p[0]) * s[1] - (q[1] - p[1]) * s[0]) / d, u = ((q[0] - p[0]) * r[1] - (q[1] - p[1]) * r[0]) / d;
+    if (t > -1e-6 && t < 1 + 1e-6 && u > -1e-6 && u < 1 + 1e-6) pts.push(addv(p, mul(r, t)));
+  }
+  return pts;
+}
+function hull(points) {
+  const P = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const p of P) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (const p of P.reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+// the part as a clean polygon (only for parts with no dents), corners snapped to dots and cut crossings
+function regionShape(r) {
+  let pts = [], area;
+  if (exact) { regions[r].units.forEach((u) => unitPoly(u).forEach((p) => pts.push(p))); area = regions[r].units.length * CELL * CELL / 4; }
+  else { for (let i = 0; i < LW * LH; i++) if (plabels[i] === r) pts.push([(i % LW) * 2 + 1, ((i / LW) | 0) * 2 + 1]); area = regions[r].squares * CELL * CELL; }
+  let H = hull(pts);
+  const snaps = snapPoints();
+  H = H.map((p) => { let best = null, bd = 28; snaps.forEach((q) => { const d = dist(p, q); if (d < bd) { bd = d; best = q; } }); return best || p; });
+  H = H.filter((p, i) => dist(p, H[(i + 1) % H.length]) > 1);
+  // drop corners that lie on a straight edge
+  for (let changed = true; changed && H.length > 3;) {
+    changed = false;
+    for (let i = 0; i < H.length; i++) {
+      const a = H[(i + H.length - 1) % H.length], b = H[i], c = H[(i + 1) % H.length];
+      const d = Math.abs((c[0] - a[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (c[1] - a[1])) / Math.max(1, dist(a, c));
+      if (d < 4 || !snaps.some((q) => dist(q, b) < .5)) { H.splice(i, 1); changed = true; break; }
+    }
+  }
+  if (H.length < 3 || Math.abs(polyArea(H) - area) / area > .04) return null;
+  if (H.length === 3) return { type: "tri", P: H, area };
+  if (H.length === 4) {
+    const xs = H.map((p) => p[0]), ys = H.map((p) => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    if (H.every((p) => (Math.abs(p[0] - x0) < 1 || Math.abs(p[0] - x1) < 1) && (Math.abs(p[1] - y0) < 1 || Math.abs(p[1] - y1) < 1)))
+      return { type: "rect", x0, y0, x1, y1, w: x1 - x0, h: y1 - y0, P: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]], area };
+  }
+  return null;
+}
+const rectOf = (x0, y0, w, h) => [[x0, y0], [x0 + w, y0], [x0 + w, y0 + h], [x0, y0 + h]];
+// a triangle cut across its middle: the trapezoid stays, the top pieces turn half way round onto the base side
+function triToRect(T) {
+  for (let s = 0; s < 3; s++) {
+    const B1 = T.P[s], B2 = T.P[(s + 1) % 3], C = T.P[(s + 2) % 3];
+    if (!(Math.abs(B1[0] - B2[0]) < 1 || Math.abs(B1[1] - B2[1]) < 1)) continue;     // base must lie along the grid
+    const M1 = mid(C, B1), M2 = mid(C, B2), d = sub(M2, M1), t = ((C[0] - M1[0]) * d[0] + (C[1] - M1[1]) * d[1]) / (d[0] ** 2 + d[1] ** 2);
+    if (t < -1e-6 || t > 1 + 1e-6) continue;
+    const F = addv(M1, mul(d, t)), F1 = sub(mul(M1, 2), F), F2 = sub(mul(M2, 2), F);
+    const xs = [B1, B2, F1, F2].map((p) => p[0]), ys = [B1, B2, F1, F2].map((p) => p[1]);
+    const R = { x0: Math.min(...xs), y0: Math.min(...ys) }; R.w = Math.max(...xs) - R.x0; R.h = Math.max(...ys) - R.y0;
+    const pieces = [
+      { tri: [B1, B2, M2, M1], rect: [B1, B2, M2, M1], pivot: null },
+      { tri: [M1, F, C], rect: [M1, F1, B1], pivot: M1 },
+      { tri: [F, M2, C], rect: [F2, M2, B2], pivot: M2 },
+    ].filter((p) => polyArea(p.tri) > 2);
+    return { R, pieces };
+  }
+  return null;
+}
+// affine moves: rotate by a about point p, then shift by v
+const tfPt = (q, a, p, v) => { const r = rot(sub(q, p), a); return [r[0] + p[0] + v[0], r[1] + p[1] + v[1]]; };
+// move a rectangle onto another of the same size: turn a quarter if needed, slide centre to centre
+function rectMove(S, D) {
+  const turn = Math.abs(S.w - D.w) < 2 && Math.abs(S.h - D.h) < 2 ? 0 : (Math.abs(S.w - D.h) < 2 && Math.abs(S.h - D.w) < 2 ? Math.PI / 2 : null);
+  if (turn === null) return null;
+  const cs = [S.x0 + S.w / 2, S.y0 + S.h / 2], cd = [D.x0 + D.w / 2, D.y0 + D.h / 2];
+  return { a: turn, p: cs, v: sub(cd, cs) };
+}
+function shapePlan(fromR, toR) {
+  const S = regionShape(fromR), T = regionShape(toR);
+  if (!S || !T || Math.abs(S.area - T.area) / T.area > .04) return null;
+  const pieceSteps = [];   // each piece: polygon where it starts, and a list of steps {a, p, v} done one after another
+  if (S.type === "rect" && T.type === "tri") {
+    const plan = triToRect(T); if (!plan) return null;
+    const mv = rectMove(S, plan.R); if (!mv) return null;
+    // pieces start inside S: undo the move to find where each piece is in S
+    const back = (q) => { const c = addv(mv.p, mv.v), r = rot(sub(q, c), -mv.a); return addv(r, mv.p); };
+    plan.pieces.forEach((pc) => pieceSteps.push({ poly: pc.rect.map(back), steps: [{ ...mv, group: true }, pc.pivot ? { a: Math.PI, p: pc.pivot, v: [0, 0] } : null] }));
+    return { pieces: pieceSteps, stages: ["Moving the rectangle onto the triangle's long side…", "Cutting it and turning the pieces into the triangle…"], kind: "rt" };
+  }
+  if (S.type === "tri" && T.type === "rect") {
+    const plan = triToRect(S); if (!plan) return null;
+    const mv = rectMove(plan.R, T); if (!mv) return null;
+    plan.pieces.forEach((pc) => pieceSteps.push({ poly: pc.tri, steps: [pc.pivot ? { a: Math.PI, p: pc.pivot, v: [0, 0] } : null, { ...mv, group: true }] }));
+    return { pieces: pieceSteps, stages: ["Cutting the triangle and turning the top pieces down…", "Moving the rectangle onto the other part…"], kind: "tr" };
+  }
+  if (S.type === "rect" && T.type === "rect") {
+    // cut into equal strips and lay them end to end
+    const sL = Math.max(S.w, S.h), sS = Math.min(S.w, S.h), tL = Math.max(T.w, T.h), tS = Math.min(T.w, T.h);
+    let k = Math.round(tL / sL);
+    const near = (a, b) => Math.abs(a - b) < 2;
+    const sAlongX = S.w >= S.h, tAlongX = T.w >= T.h;
+    if (k >= 2 && near(tL, k * sL) && near(sS, k * tS)) {
+      // S is chunky, T is long: cut S into k strips across its short side, line them up along T
+      for (let i = 0; i < k; i++) {
+        const piece = sAlongX ? rectOf(S.x0, S.y0 + i * S.h / k, S.w, S.h / k) : rectOf(S.x0 + i * S.w / k, S.y0, S.w / k, S.h);
+        const pr = { x0: Math.min(...piece.map((p) => p[0])), y0: Math.min(...piece.map((p) => p[1])) }; pr.w = Math.max(...piece.map((p) => p[0])) - pr.x0; pr.h = Math.max(...piece.map((p) => p[1])) - pr.y0;
+        const dst = tAlongX ? { x0: T.x0 + i * T.w / k, y0: T.y0, w: T.w / k, h: T.h } : { x0: T.x0, y0: T.y0 + i * T.h / k, w: T.w, h: T.h / k };
+        const mv = rectMove(pr, dst); if (!mv) return null;
+        pieceSteps.push({ poly: piece, steps: Array.from({ length: k }, (_, j) => j === i ? mv : null) });
+      }
+      return { pieces: pieceSteps, stages: Array.from({ length: k }, (_, j) => `Cutting into ${k} pieces and laying them end to end… (${j + 1} of ${k})`), kind: "rr" };
+    }
+    k = Math.round(sL / tL);
+    if (k >= 2 && near(sL, k * tL) && near(tS, k * sS)) {
+      // S is long, T is chunky: cut S into k pieces along its length, stack them in T
+      for (let i = 0; i < k; i++) {
+        const piece = sAlongX ? rectOf(S.x0 + i * S.w / k, S.y0, S.w / k, S.h) : rectOf(S.x0, S.y0 + i * S.h / k, S.w, S.h / k);
+        const pr = { x0: Math.min(...piece.map((p) => p[0])), y0: Math.min(...piece.map((p) => p[1])) }; pr.w = Math.max(...piece.map((p) => p[0])) - pr.x0; pr.h = Math.max(...piece.map((p) => p[1])) - pr.y0;
+        const dst = tAlongX ? { x0: T.x0, y0: T.y0 + i * T.h / k, w: T.w, h: T.h / k } : { x0: T.x0 + i * T.w / k, y0: T.y0, w: T.w / k, h: T.h };
+        const mv = rectMove(pr, dst); if (!mv) return null;
+        pieceSteps.push({ poly: piece, steps: Array.from({ length: k }, (_, j) => j === i ? mv : null) });
+      }
+      return { pieces: pieceSteps, stages: Array.from({ length: k }, (_, j) => `Cutting into ${k} pieces and stacking them… (${j + 1} of ${k})`), kind: "rr" };
+    }
+  }
+  return null;
+}
+// where a piece is at time e (0..1) of step s, after all earlier steps
+function pieceAtStep(pc, s, e) {
+  let poly = pc.poly;
+  pc.steps.forEach((st, i) => {
+    if (!st || i > s) return;
+    const f = i < s ? 1 : e;
+    // a group move turns about the group's start; a pivot turn goes round its pivot point
+    poly = poly.map((q) => tfPt(q, st.a * f, st.p, mul(st.v, f)));
+  });
+  return poly;
+}
+function drawPlan(now) {
+  const A = dr.anim, el_ = (now - A.t0) * rate(A), plan = A.plan;
+  const HOLD = 1200, STEP = 3200, GAP = 900, n = plan.stages.length;
+  const total = HOLD + n * (STEP + GAP);
+  const s = Math.min(n - 1, Math.max(0, Math.floor((el_ - HOLD) / (STEP + GAP))));
+  const local = (el_ - HOLD - s * (STEP + GAP)) / STEP, e = el_ < HOLD ? 0 : ease(clamp01(local));
+  plan.pieces.forEach((pc, i) => {
+    // steps already done are complete; pieces start from where the previous steps left them
+    let poly = pc.poly;
+    for (let j = 0; j <= s; j++) {
+      const st = pc.steps[j]; if (!st) continue;
+      const f = j < s ? 1 : e;
+      // move from where it was at the start of this step
+      poly = poly.map((q) => tfPt(q, st.a * f, st.p, mul(st.v, f)));
+    }
+    fillPoly(poly, A.col, .6);
+    g2.strokeStyle = "#FFFDF8"; g2.lineWidth = 4; g2.beginPath(); poly.forEach(([x, y], k) => (k ? g2.lineTo(x, y) : g2.moveTo(x, y))); g2.closePath(); g2.stroke();
+  });
+  A.phase = el_ < HOLD ? "Look at the two parts…" : plan.stages[s];
+  if (el_ > total) A.done = true;
+}
+
+// ---------- any two parts: the part flows into the other shape ----------
+// Used when there is no simple cut recipe. The part is broken into tiny bits (drawn without lines, so it looks like
+// one piece being reshaped), the bits travel into the other part, and the edges are cleaned up at the end.
+function flowPlan(fromR, toR) {
+  const T = 15, bits = (r) => {
+    const out = [];
+    for (let y = DS0 + T / 2; y < DS0 + GR * CELL; y += T) for (let x = DS0 + T / 2; x < DS0 + GC * CELL; x += T) if (regionAt(x, y) === r) out.push([x, y]);
+    return out;
+  };
+  let src = bits(fromR), dst = bits(toR);
+  const RA = regions[fromR], RB = regions[toR];
+  const areaA = exact ? RA.units.length : RA.count, areaB = exact ? RB.units.length : RB.count;
+  const equal = Math.abs(areaA - areaB) / areaB < .03;
+  // the grid of bits is rough at slanted edges; when the parts are the same size, even the counts out
+  if (equal) { while (src.length > dst.length) src.splice(Math.floor(src.length / 2), 1); while (dst.length > src.length) dst.splice(Math.floor(dst.length / 2), 1); }
+  // match bits row by row, each scaled to its own part, so the shape pours across in order
+  const box = (P) => { const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs) || 1, Math.max(...ys) - Math.min(...ys) || 1]; };
+  const order = (P) => { const [x0, y0, w, h] = box(P); return [...P].sort((a, b) => Math.round((a[1] - y0) / h * 24) - Math.round((b[1] - y0) / h * 24) || (a[0] - x0) / w - (b[0] - x0) / w); };
+  src = order(src); dst = order(dst);
+  const n = Math.min(src.length, dst.length);
+  return { T, pairs: src.map((p, i) => ({ from: p, to: i < n ? dst[i] : null })), equal, extraDst: dst.slice(n) };
+}
+let flowLayer = null;
+function drawFlow(now) {
+  const A = dr.anim, el_ = (now - A.t0) * rate(A), F = A.flow;
+  const HOLD = 1200, BREAK = 600, FLY = 3200, SPREAD = 2600, SETTLE = 700, CLEAN = 900;
+  const flyStart = HOLD + BREAK, settleAt = flyStart + SPREAD + FLY, total = settleAt + SETTLE + CLEAN;
+  const n = F.pairs.length, br = ease(clamp01((el_ - HOLD) / BREAK)), settle = clamp01((el_ - settleAt) / SETTLE), clean = clamp01((el_ - settleAt - SETTLE) / CLEAN);
+  if (clean > 0 && F.equal) paintRegion(A.to, A.col, .6 * clean);
+  // bits are drawn solid on a separate layer, then laid down see-through, so they look like one smooth piece
+  if (!flowLayer || flowLayer.width !== DW || flowLayer.height !== DH) { flowLayer = document.createElement("canvas"); flowLayer.width = DW; flowLayer.height = DH; }
+  const fl = flowLayer.getContext("2d"); fl.clearRect(0, 0, DW, DH); fl.fillStyle = A.col;
+  F.pairs.forEach((pr, i) => {
+    const e = pr.to ? ease(clamp01((el_ - flyStart - (i / Math.max(1, n - 1)) * SPREAD) / FLY)) : 0;
+    const tgt = pr.to || pr.from, lift = Math.sin(Math.PI * e) * -50;
+    const x = pr.from[0] + (tgt[0] - pr.from[0]) * e, y = pr.from[1] + (tgt[1] - pr.from[1]) * e + lift;
+    const sz = F.T * 1.2;
+    fl.fillRect(x - sz / 2, y - sz / 2, sz, sz);
+  });
+  g2.globalAlpha = .6 * (F.equal ? 1 - clean : 1); g2.drawImage(flowLayer, 0, 0); g2.globalAlpha = 1;
+  A.phase = el_ < HOLD ? "Look at the two parts…" : el_ < flyStart ? "Breaking the part up…" : el_ < settleAt ? "Rearranging it to fit the other part…" : "Putting it together…";
+  if (el_ > total) A.done = true;
+}
+
+function startCheck() {
+  const cols = coloured(); if (cols.length < 2) return;
+  const from = cols[cols.length - 2].r, to = cols[cols.length - 1].r, col = cols[cols.length - 2].col;
+  clearPieces(); dr.msg = "";
+  const go = () => { const loop = (now) => { if (!dr.anim) return; renderDraw(now); if (!dr.anim.done) requestAnimationFrame(loop); }; requestAnimationFrame(loop); };
+  // same shape: lay it on top; rectangle and triangle, or two rectangles: cut and rearrange
+  const same = exact ? rigidFit(from, to) : pixelFit(from, to);
+  if (!same) {
+    const plan = shapePlan(from, to);
+    if (plan) { dr.anim = { from, to, col, t0: performance.now(), plan, done: false }; go(); return; }
+  }
+  if (!exact) {
+    const pf = pixelFit(from, to);
+    if (!pf) { dr.anim = { from, to, col, t0: performance.now(), flow: flowPlan(from, to), done: false }; go(); return; }
+    dr.anim = { from, to, col, t0: performance.now(), rigid: true, pixel: true, fit: pf, done: false };
+    const loop = (now) => { if (!dr.anim) return; renderDraw(now); if (!dr.anim.done) requestAnimationFrame(loop); };
+    requestAnimationFrame(loop); return;
+  }
+  const fit = rigidFit(from, to);
+  dr.anim = { from, to, col, t0: performance.now(), rigid: !!fit, fit, done: false,
+    moves: fit ? null : dissectFit(from, to) };
+  const loop = (now) => { if (!dr.anim) return; renderDraw(now); if (!dr.anim.done) requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+}
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+function drawMoving(now) {
+  if (dr.anim.plan) return drawPlan(now);
+  if (dr.anim.flow) return drawFlow(now);
+  const A = dr.anim, el_ = (now - A.t0) * rate(A);
+  const outline = (pts) => { g2.strokeStyle = "#FFFDF8"; g2.lineWidth = 3; g2.beginPath(); pts.forEach(([x, y], i) => (i ? g2.lineTo(x, y) : g2.moveTo(x, y))); g2.closePath(); g2.stroke(); };
+  if (A.pixel) {
+    const RA = regions[A.from], RB = regions[A.to], e = ease(clamp01((el_ - 600) / 4000));
+    g2.save();
+    g2.translate(RA.cx + (RB.cx - RA.cx) * e, RA.cy + (RB.cy - RA.cy) * e);
+    g2.rotate(A.fit.th * e); if (A.fit.flip) g2.scale(1 - 2 * e, 1);
+    g2.translate(-RA.cx, -RA.cy);
+    g2.drawImage(maskCanvas(A.from, A.col, .55, false), 0, 0, LW, LH, 0, 0, DW, DH);
+    g2.restore();
+    A.phase = el_ < 600 ? "Look at the two parts…" : "Moving one part on top of the other…";
+    if (el_ > 4800) A.done = true;
+    return;
+  }
+  if (A.rigid) {
+    // same shape: lift, slide and turn slowly as one piece
+    const RA = regions[A.from], RB = regions[A.to], e = ease(clamp01((el_ - 600) / 4000));
+    RA.units.forEach((u) => {
+      const pts = unitPoly(u).map(([x, y]) => {
+        let v = [x - RA.cx, y - RA.cy]; if (A.fit.flip) v[0] *= 1 - 2 * e;
+        v = rot(v, A.fit.th * e);
+        return [v[0] + RA.cx + (RB.cx - RA.cx) * e, v[1] + RA.cy + (RB.cy - RA.cy) * e];
+      });
+      fillPoly(pts, A.col, .55);
+    });
+    A.phase = el_ < 600 ? "Look at the two parts…" : "Moving one part on top of the other…";
+    if (el_ > 4800) A.done = true;
+    return;
+  }
+  // different shapes:
+  // 1. BREAK (0 to 2.2 s): the part comes apart; the pieces drift away from each other so the gaps show
+  // 2. FIT: pieces travel one at a time, turning as they go
+  // 3. CLOSE UP: the pieces settle together inside the other part
+  const RA = regions[A.from], n = A.moves.length;
+  const BREAK = 2200, HOLD = 800, FLY = 2200, GAP = n > 1 ? Math.min(1400, 9000 / (n - 1)) : 0, SETTLE = 900;
+  const flyStart = BREAK + HOLD, total = flyStart + (n - 1) * GAP + FLY + SETTLE;
+  const moved = new Set(); A.moves.forEach((m) => m.units.forEach((u) => moved.add(u)));
+  RA.units.forEach((u) => { if (!moved.has(u)) fillPoly(unitPoly(u), A.col, .55); });   // pieces with nowhere to go stay put
+  const br = ease(clamp01(el_ / BREAK));
+  A.moves.forEach((m, i) => {
+    const e = ease(clamp01((el_ - flyStart - i * GAP) / FLY));
+    const settle = clamp01((el_ - (total - SETTLE)) / SETTLE);
+    // drift outwards from the middle of the part while breaking; the drift goes away as the piece lands
+    let ox = m.from[0] - RA.cx, oy = m.from[1] - RA.cy; const len = Math.hypot(ox, oy) || 1;
+    const spread = 34 * br * (1 - e); ox = ox / len * spread; oy = oy / len * spread;
+    const s = 1 - .14 * br * (1 - settle);
+    const lift = Math.sin(Math.PI * e) * -40;   // a small arc so the travel is easy to follow
+    const cx = m.from[0] + (m.to[0] - m.from[0]) * e + ox, cy = m.from[1] + (m.to[1] - m.from[1]) * e + oy + lift, a = m.k * Math.PI / 2 * e;
+    m.polys.forEach((poly) => {
+      const pts = poly.map(([x, y]) => { const v = rot([(x - m.from[0]) * s, (y - m.from[1]) * s], a); return [v[0] + cx, v[1] + cy]; });
+      fillPoly(pts, A.col, .6); outline(pts);
+    });
+  });
+  const flying = A.moves.filter((m, i) => el_ > flyStart + i * GAP && el_ < flyStart + i * GAP + FLY).length;
+  A.phase = el_ < BREAK + HOLD ? "Breaking the part into pieces…" : el_ < total - SETTLE ? `Fitting the pieces into the other part… (${Math.min(n, Math.floor((el_ - flyStart) / GAP) + 1)} of ${n})` : "Putting the pieces together…";
+  if (el_ > total) A.done = true;
+}
+
+function nearestDot(x, y) {
+  const i = Math.round((x - DS0) / CELL), j = Math.round((y - DS0) / CELL);
+  if (i < 0 || j < 0 || i > GC || j > GR) return null;
+  return Math.hypot(x - (DS0 + i * CELL), y - (DS0 + j * CELL)) < CELL * .45 ? [i, j] : null;
+}
+const posOf = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * DW / r.width, (e.clientY - r.top) * DH / r.height]; };
+const resetAnim = () => { dr.anim = null; };
+cv.addEventListener("pointerdown", (e) => {
+  if (dr.anim) return;
+  if (dr.tool === "move") {
+    const [x, y] = posOf(e), pc = liftAt(x, y); if (!pc) return;
+    cv.setPointerCapture(e.pointerId); selectPiece(pc);
+    dr.pieces = dr.pieces.filter((q) => q !== pc).concat(pc);   // bring to the top
+    dr.mv = { pc, x0: x, y0: y, tx0: pc.tx, ty0: pc.ty }; cv.style.cursor = "grabbing"; renderDraw(); return;
+  } const [x, y] = posOf(e); cv.setPointerCapture(e.pointerId); dr.drag = { x0: x, y0: y, x, y, dot: nearestDot(x, y) }; renderDraw(); });
+cv.addEventListener("pointermove", (e) => {
+  if (dr.mv) { const [x, y] = posOf(e); dr.mv.pc.tx = dr.mv.tx0 + x - dr.mv.x0; dr.mv.pc.ty = dr.mv.ty0 + y - dr.mv.y0; renderDraw(); return; }
+  if (!dr.drag) return; [dr.drag.x, dr.drag.y] = posOf(e); renderDraw(); });
+cv.addEventListener("pointerup", (e) => {
+  if (dr.mv) {
+    const m = dr.mv, [x, y] = posOf(e); dr.mv = null; cv.style.cursor = "grab";
+    // a tap (no drag) on a part that has not been moved yet just colours it, it does not lift it
+    if (Math.hypot(x - m.x0, y - m.y0) < 18 && !m.pc.tx && !m.pc.ty && !m.pc.k && !m.pc.flip) {
+      dr.pieces = dr.pieces.filter((q) => q !== m.pc); dr.history = dr.history.filter((h) => h.pc !== m.pc); selectPiece(null);
+    } else snapPiece(m.pc);
+    renderDraw(); return;
+  }
+  if (!dr.drag) return;
+  const d = dr.drag; [d.x, d.y] = posOf(e); dr.drag = null; dr.msg = "";
+  if (Math.hypot(d.x - d.x0, d.y - d.y0) < 18) {
+    const r = regionAt(d.x, d.y);
+    if (r >= 0) {
+      const had = dr.taps.filter((t) => regionAt(t.x, t.y) === r);
+      if (had.length) { dr.taps = dr.taps.filter((t) => !had.includes(t)); dr.history.push({ type: "uncolour", taps: had }); }
+      else { const t = { x: d.x, y: d.y, col: PAL[dr.next++ % PAL.length] }; dr.taps.push(t); dr.history.push({ type: "colour", tap: t }); }
+    }
+  } else {
+    const a = d.dot, b = nearestDot(d.x, d.y);
+    if (a && b && (a[0] !== b[0] || a[1] !== b[1])) {
+      const dx = b[0] - a[0], dy = b[1] - a[1];
+      const onEdge = WHOLES.some((W) => (dx === 0 && (a[0] === W.c0 || a[0] === W.c0 + W.w)) || (dy === 0 && (a[1] === W.r0 || a[1] === W.r0 + W.h)));
+      if (!onEdge) { clearPieces(); dr.lines.push({ a, b }); dr.history.push({ type: "cut" }); computeRegions(); }
+    }
+  }
+  renderDraw();
+});
+cv.addEventListener("pointercancel", () => { if (dr.mv) { snapPiece(dr.mv.pc); dr.mv = null; } dr.drag = null; renderDraw(); });
+document.getElementById("dr-speed").onchange = (e) => {
+  // keep an animation that is playing at the same point when the speed changes
+  if (dr.anim) { const now = performance.now(), el = (now - dr.anim.t0) * rate(dr.anim); dr.speed = e.target.value; dr.anim.t0 = now - el / rate(dr.anim); }
+  else dr.speed = e.target.value;
+};
+document.getElementById("tool-cut").onclick = () => setTool("cut");
+document.getElementById("tool-move").onclick = () => setTool("move");
+document.getElementById("pc-turn").onclick = () => { if (dr.sel) { dr.sel.k = (dr.sel.k + 1) % 4; renderDraw(); } };
+document.getElementById("pc-flip").onclick = () => { if (dr.sel) { dr.sel.flip = !dr.sel.flip; renderDraw(); } };
+// Undo takes back exactly one step: the last cut, or the last colouring or clearing of a part
+document.getElementById("dr-undo").onclick = () => {
+  resetAnim();
+  const h = dr.history.pop();
+  if (h && h.type === "lift") { dr.pieces = dr.pieces.filter((q) => q !== h.pc); if (dr.sel === h.pc) selectPiece(null); }
+  else if (h && h.type === "cut") { clearPieces(); dr.lines.pop(); }
+  else if (h && h.type === "colour") dr.taps = dr.taps.filter((t) => t !== h.tap);
+  else if (h && h.type === "uncolour") dr.taps.push(...h.taps);
+  computeRegions(); renderDraw();
+};
+document.getElementById("dr-clear").onclick = () => { resetAnim(); dr.lines = []; dr.taps = []; dr.next = 0; dr.history = []; dr.pieces = []; selectPiece(null); dr.msg = ""; computeRegions(); renderDraw(); };
+document.getElementById("dr-sizes").onclick = (e) => { dr.sizes = !dr.sizes; e.currentTarget.setAttribute("aria-pressed", String(dr.sizes)); renderDraw(); };
+document.getElementById("dr-check").onclick = startCheck;
+document.getElementById("dr-back").onclick = () => { resetAnim(); clearPieces(); renderDraw(); };
+document.getElementById("sh-grid").onclick = () => setGrid(!sh.grid);
+document.getElementById("sh-again").onclick = drawShapes;
+// ---------- Part 3: same shape? same size? ----------
+// Six pairs of figures on a grid. Students decide, then one figure is moved (and cut if needed) onto the other.
+const p3 = document.getElementById("p3"), g3 = p3.getContext("2d");
+const GU = 50, OX = 40, OY = 35;   // one grid square = 50 px
+const P = ([x, y]) => [OX + x * GU, OY + y * GU];
+// each step: turn by a (and flip if asked) about point p, then shift by v; all in grid squares
+const EXAMPLES = [
+  { A: [[1, 1], [5, 1], [1, 4]], B: [[13, 2], [13, 6], [10, 2]], shape: true, size: true,
+    pieces: [{ poly: [[1, 1], [5, 1], [1, 4]], steps: [{ a: Math.PI / 2, p: [1, 1], v: [12, 1] }] }],
+    stages: ["Turning A and sliding it onto B…"] },
+  { A: [[2, 2], [4, 2], [4, 4], [2, 4]], B: [[10, 1], [14, 1], [14, 5], [10, 5]], shape: true, size: false,
+    pieces: [{ poly: [[2, 2], [4, 2], [4, 4], [2, 4]], steps: [{ a: 0, p: [2, 2], v: [8, -1] }] }],
+    stages: ["Sliding A onto B…"] },
+  { A: [[1, 1], [5, 1], [5, 5], [1, 5]], B: [[7, 5], [15, 5], [15, 7], [7, 7]], shape: false, size: true,
+    pieces: [{ poly: [[1, 1], [5, 1], [5, 3], [1, 3]], steps: [{ a: 0, p: [1, 1], v: [6, 4] }, null] },
+             { poly: [[1, 3], [5, 3], [5, 5], [1, 5]], steps: [null, { a: 0, p: [1, 3], v: [10, 2] }] }],
+    stages: ["Cutting A in half and sliding the top piece onto B…", "Sliding the other piece onto B…"] },
+  { A: [[1, 1], [3, 1], [3, 5], [5, 5], [5, 7], [1, 7]], B: [[14, 1], [12, 1], [12, 5], [10, 5], [10, 7], [14, 7]], shape: true, size: true,
+    pieces: [{ poly: [[1, 1], [3, 1], [3, 5], [5, 5], [5, 7], [1, 7]], steps: [{ a: 0, p: [1, 1], v: [13, 0], flip: true }] }],
+    stages: ["Flipping A over and sliding it onto B…"] },
+  { A: [[1, 2], [5, 2], [5, 6], [1, 6]], B: [[10, 0], [10, 8], [14, 8]], shape: false, size: true,
+    pieces: [{ poly: [[1, 6], [5, 6], [3, 2], [1, 2]], steps: [{ a: 0, p: [1, 2], v: [9, 2] }, null] },
+             { poly: [[5, 2], [3, 2], [5, 6]], steps: [{ a: 0, p: [1, 2], v: [9, 2] }, { a: Math.PI, p: [12, 4], v: [0, 0] }] }],
+    stages: ["Sliding A onto the bottom of B…", "Cutting off the corner and turning it into the top of B…"] },
+  { A: [[1, 1], [3, 1], [3, 7], [1, 7]], B: [[9, 2], [13, 2], [13, 6], [9, 6]], shape: false, size: false,
+    pieces: [{ poly: [[1, 1], [3, 1], [3, 3], [1, 3]], steps: [{ a: 0, p: [1, 1], v: [8, 1] }, null, null] },
+             { poly: [[1, 3], [3, 3], [3, 5], [1, 5]], steps: [null, { a: 0, p: [1, 3], v: [10, -1] }, null] },
+             { poly: [[1, 5], [3, 5], [3, 7], [1, 7]], steps: [null, null, { a: 0, p: [1, 5], v: [8, -1] }] }],
+    stages: ["Cutting A into pieces and moving the first piece onto B…", "Moving the second piece…", "Moving the third piece…"] },
+];
+const p3s = { ex: 0, anim: null, grid: false, vote: { shape: null, size: null }, answer: false, speed: "slow" };
+const p3Base = (ex) => 1500 + ex.stages.length * 4100;
+const p3Rate = () => p3Base(EXAMPLES[p3s.ex]) / TARGETS[p3s.speed];
+function stepPt(q, st, f) {
+  let v = sub(q, st.p);
+  if (st.flip) v = [v[0] * (1 - 2 * f), v[1]];
+  v = rot(v, st.a * f);
+  return [v[0] + st.p[0] + st.v[0] * f, v[1] + st.p[1] + st.v[1] * f];
+}
+function poly3(pts, fill, alpha, stroke, width, dash = []) {
+  g3.beginPath(); pts.map(P).forEach(([x, y], i) => (i ? g3.lineTo(x, y) : g3.moveTo(x, y))); g3.closePath();
+  if (fill) { g3.globalAlpha = alpha; g3.fillStyle = fill; g3.fill(); g3.globalAlpha = 1; }
+  if (stroke) { g3.save(); g3.strokeStyle = stroke; g3.lineWidth = width; g3.lineJoin = "round"; g3.setLineDash(dash); g3.stroke(); g3.restore(); }
+}
+function drawP3(now) {
+  const ex = EXAMPLES[p3s.ex], W = p3.width, H = p3.height;
+  g3.clearRect(0, 0, W, H);
+  g3.fillStyle = "#FFFDF8"; g3.fillRect(0, 0, W, H);
+  if (p3s.grid) {
+    g3.strokeStyle = "rgba(58,42,51,.18)"; g3.lineWidth = 1.5;
+    for (let x = 0; x <= 16; x++) { g3.beginPath(); g3.moveTo(...P([x, 0])); g3.lineTo(...P([x, 9])); g3.stroke(); }
+    for (let y = 0; y <= 9; y++) { g3.beginPath(); g3.moveTo(...P([0, y])); g3.lineTo(...P([16, y])); g3.stroke(); }
+  }
+  const A = p3s.anim;
+  // B stays put
+  poly3(ex.B, "#1F7A55", .5, null);
+  // A: where it starts
+  if (A) poly3(ex.A, null, 0, "#2F62B0", 4, [12, 9]); else poly3(ex.A, "#2F62B0", .55, "#2F62B0", 5);
+  let phase = "Is A the same shape as B? Is A the same size as B?";
+  if (A) {
+    const el = (now - A.t0) * p3Rate(), HOLD = 1500, STEP = 3200, GAP = 900, n = ex.stages.length, total = HOLD + n * (STEP + GAP);
+    const s = Math.min(n - 1, Math.max(0, Math.floor((el - HOLD) / (STEP + GAP))));
+    const e = el < HOLD ? 0 : ease(clamp01((el - HOLD - s * (STEP + GAP)) / STEP));
+    ex.pieces.forEach((pc) => {
+      let pts = pc.poly;
+      for (let j = 0; j <= s; j++) { const st = pc.steps[j]; if (!st) continue; const f = el < HOLD ? 0 : (j < s ? 1 : e); pts = pts.map((q) => stepPt(q, st, f)); }
+      poly3(pts, "#2F62B0", .6, "#FFFDF8", 3);
+    });
+    phase = el < HOLD ? "Watch A…" : ex.stages[s];
+    if (el > total) { A.done = true; phase = "Does A cover B exactly? Is anything left over, or is there a gap?"; }
+  }
+  // B's outline on top, so the overlap shows
+  poly3(ex.B, null, 0, "#1F7A55", 6);
+  g3.font = "700 34px Andika, Verdana, sans-serif"; g3.textAlign = "center"; g3.textBaseline = "middle";
+  const label = (t, pts, col) => { const c = polyCentre(pts); const [x, y] = P(c); g3.lineWidth = 7; g3.strokeStyle = "#FFFDF8"; g3.strokeText(t, x, y); g3.fillStyle = col; g3.fillText(t, x, y); };
+  if (!A) label("A", ex.A, "#2F62B0");
+  label("B", ex.B, "#1F7A55");
+  let cap = phase;
+  if (p3s.answer) cap = `<b>Same shape: ${ex.shape ? "yes" : "no"} &nbsp;·&nbsp; Same size: ${ex.size ? "yes" : "no"}</b> &nbsp;Press "Show answer" again to hide it.`;
+  document.getElementById("caption3").innerHTML = cap;
+  document.getElementById("p3-check").disabled = !!A && !A.done;
+  const celebrating = p3s.answer && drawAnswerCard(now);
+  if ((A && !A.done) || celebrating) requestAnimationFrame(drawP3);
+}
+// ---- the answer, big on the board: a celebration when the class got both right, encouragement when not ----
+let confetti = [];
+function wrapText(t, x, y, maxW, lh) {
+  const words = t.split(" "); let line = "";
+  words.forEach((w) => { const test = line ? line + " " + w : w; if (g3.measureText(test).width > maxW && line) { g3.fillText(line, x, y); y += lh; line = w; } else line = test; });
+  if (line) g3.fillText(line, x, y); return y + lh;
+}
+function drawAnswerCard(now) {
+  const ex = EXAMPLES[p3s.ex], v = p3s.vote, el = now - p3s.revealT0;
+  const voted = v.shape !== null || v.size !== null;
+  const okShape = v.shape === (ex.shape ? "y" : "n"), okSize = v.size === (ex.size ? "y" : "n"), allRight = voted && okShape && okSize;
+  const W = p3.width, x0 = 160, y0 = 120, w = W - 320, h = 250;
+  const pop = Math.min(1, el / 350), sc = .85 + .15 * ease(pop);
+  g3.save(); g3.translate(W / 2, y0 + h / 2); g3.scale(sc, sc); g3.translate(-W / 2, -(y0 + h / 2)); g3.globalAlpha = pop;
+  g3.fillStyle = "rgba(255,253,248,.96)"; g3.strokeStyle = allRight ? "#1F7A55" : "#D9467A"; g3.lineWidth = 6;
+  g3.beginPath(); g3.roundRect(x0, y0, w, h, 26); g3.fill(); g3.stroke();
+  g3.textAlign = "center"; g3.textBaseline = "middle";
+  g3.font = "700 50px Andika, Verdana, sans-serif"; g3.fillStyle = allRight ? "#1F7A55" : "#3A2A33";
+  g3.fillText(!voted ? "The answer" : allRight ? "You are correct!" : "You are wrong.", W / 2, y0 + 58);
+  const row = (label, truth, said, ok, y) => {
+    g3.font = "700 38px Andika, Verdana, sans-serif"; g3.fillStyle = "#3A2A33"; g3.textAlign = "center";
+    g3.fillText(`${label}: ${truth ? "Yes" : "No"}`, W / 2, y);
+    if (false) {
+      g3.textAlign = "right"; g3.font = "700 30px Andika, Verdana, sans-serif"; g3.fillStyle = ok ? "#1F7A55" : "#C2570C";
+      g3.fillText(`${ok ? "\u2714" : "\u2718"} You said ${said === "y" ? "Yes" : "No"}`, x0 + w - 60, y);
+    }
+  };
+  row("Same shape", ex.shape, v.shape, okShape, y0 + 130);
+  row("Same size", ex.size, v.size, okSize, y0 + 190);
+  g3.textAlign = "center"; g3.font = "400 26px Andika, Verdana, sans-serif"; g3.fillStyle = "#5B4650";
+  let msg;
+  if (!voted) msg = "Did A cover B exactly? Does A look like B, just bigger, smaller, turned or flipped?";
+  else if (allRight) msg = "You looked carefully and checked by moving A onto B. That is how mathematicians check!";
+  else {
+    const tips = [];
+    if (!okShape) tips.push("Same shape means A looks just like B, maybe bigger, smaller, turned or flipped.");
+    if (!okSize) tips.push("Same size means A covers B exactly, even if we cut A and move the pieces.");
+    msg = "Mistakes help us learn. " + tips.join(" ") + " Watch A move onto B again.";
+  }
+
+  g3.restore();
+  // confetti for a fully correct answer
+  if (allRight) {
+    if (!confetti.length && el < 100) confetti = Array.from({ length: 140 }, () => ({ x: Math.random() * W, y: -20 - Math.random() * 200, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 3, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+      c: ["#2F62B0", "#1F7A55", "#C2570C", "#D9467A", "#FAC748", "#9B3FB5"][Math.floor(Math.random() * 6)] }));
+    confetti.forEach((p) => { p.x += p.vx; p.y += p.vy; p.r += p.vr; g3.save(); g3.translate(p.x, p.y); g3.rotate(p.r); g3.fillStyle = p.c; g3.fillRect(-6, -3, 12, 6); g3.restore(); });
+    if (el > 4500) confetti = [];
+    return el < 4500;
+  }
+  return el < 400;
+}
+function p3Show(i) {
+  p3s.ex = i; p3s.anim = null; p3s.answer = false; p3s.vote = { shape: null, size: null };
+  EXAMPLES.forEach((_, k) => document.getElementById(`ex${k}`).setAttribute("aria-pressed", String(k === i)));
+  ["shape", "size"].forEach((q) => ["y", "n"].forEach((a) => document.getElementById(`v-${q}-${a}`).setAttribute("aria-pressed", "false")));
+  document.getElementById("p3-answer").setAttribute("aria-pressed", "false");
+  drawP3(performance.now());
+}
+function p3Wire() {
+  EXAMPLES.forEach((_, k) => (document.getElementById(`ex${k}`).onclick = () => p3Show(k)));
+  document.getElementById("p3-prev").onclick = () => p3Show((p3s.ex + EXAMPLES.length - 1) % EXAMPLES.length);
+  document.getElementById("p3-next").onclick = () => p3Show((p3s.ex + 1) % EXAMPLES.length);
+  ["shape", "size"].forEach((q) => ["y", "n"].forEach((a) => (document.getElementById(`v-${q}-${a}`).onclick = () => {
+    p3s.vote[q] = a; ["y", "n"].forEach((b) => document.getElementById(`v-${q}-${b}`).setAttribute("aria-pressed", String(b === a)));
+    if (p3s.answer) { p3s.revealT0 = performance.now(); confetti = []; drawP3(performance.now()); }
+  })));
+  document.getElementById("p3-check").onclick = () => { p3s.anim = { t0: performance.now(), done: false }; drawP3(performance.now()); };
+  document.getElementById("p3-back").onclick = () => { p3s.anim = null; drawP3(performance.now()); };
+  document.getElementById("p3-grid").onclick = (e) => { p3s.grid = !p3s.grid; e.currentTarget.setAttribute("aria-pressed", String(p3s.grid)); drawP3(performance.now()); };
+  document.getElementById("p3-answer").onclick = (e) => { p3s.answer = !p3s.answer; p3s.revealT0 = performance.now(); confetti = []; e.currentTarget.setAttribute("aria-pressed", String(p3s.answer)); drawP3(performance.now()); };
+  document.getElementById("p3-speed").onchange = (e) => {
+    if (p3s.anim) { const now = performance.now(), el = (now - p3s.anim.t0) * p3Rate(); p3s.speed = e.target.value; p3s.anim.t0 = now - el / p3Rate(); }
+    else p3s.speed = e.target.value;
+  };
+}
+p3Wire();
+
+function setTab(n) {
+  [["tab-cut", 1], ["tab-shapes", 2], ["tab-p3", 3]].forEach(([id, k]) => document.getElementById(id).setAttribute("aria-pressed", String(k === n)));
+  document.getElementById("cutPanel").hidden = n !== 1; document.getElementById("shapesPanel").hidden = n !== 2; document.getElementById("p3Panel").hidden = n !== 3;
+  svg2.removeAttribute("hidden");
+  svg.style.display = n === 1 ? "" : "none"; p3.style.display = n === 3 ? "" : "none";
+  document.getElementById("story").hidden = !(n === 2 && sh.mode === "draw" && stu.on);
+  if (n === 2) showShapes(); else { svg2.style.display = "none"; cv.style.display = "none"; }
+  if (n === 1) redrawAndCutAll();
+  if (n === 3) drawP3(performance.now());
+}
+// full screen: works from a click in desktop browsers; some tablets do not allow it
+document.getElementById("b-full").onclick = async (e) => {
+  const btn = e.currentTarget, root = document.documentElement;
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) { await (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+    else { await (root.requestFullscreen || root.webkitRequestFullscreen).call(root); }
+  } catch { btn.textContent = "Not allowed here"; setTimeout(() => (btn.textContent = "Full screen"), 2500); }
+};
+document.addEventListener("fullscreenchange", () => (document.getElementById("b-full").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen"));
+document.getElementById("tab-cut").onclick = () => setTab(1);
+document.getElementById("tab-shapes").onclick = () => setTab(2);
+document.getElementById("tab-p3").onclick = () => setTab(3);
+
+
+function setCount(n) {
+  state.count = n;
+  [1, 2, 3].forEach((i) => document.getElementById(`n${i}`).setAttribute("aria-pressed", String(i === n)));
+  buildRows(); redrawAndCutAll();
+}
+[1, 2, 3].forEach((i) => (document.getElementById(`n${i}`).onclick = () => setCount(i)));
+document.getElementById("zoom").oninput = applyZoom;
+document.getElementById("b-stack").onclick = stack;
+document.getElementById("b-fit").onclick = cutToFit;
+document.getElementById("b-move").onclick = () => setMoveMode(!moveMode);
+document.getElementById("b-replay").onclick = redrawAndCutAll;
+setCount(2);
+</script>
+
+</body></html>
